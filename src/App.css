@@ -1,0 +1,183 @@
+* {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	background: #2C3E50;
+	color: white;
+	font-family: monospace;
+	height: 100vh;
+
+	#root {
+		height:100%;
+		width: 100%;;
+	}
+
+	main {
+		display: flex;
+		align-items: center;
+		height: 100%;
+
+		.sidebar {
+			position: relative;
+			background: #222;
+			padding: 50px;
+			height: 100%;
+			min-width: 300px;
+
+			/*
+			background: url('/images/textures/scroll.png');
+			&::after {
+				position: absolute;
+				inset: 5px;
+				content: '';
+				border: 15px solid;
+				border-image: url('/images/textures/redscroll.jpg') 30;
+				pointer-events: none;
+			}
+			*/
+
+			label {
+				font-weight: 800;
+				display: block;
+
+				input, select {
+					margin-left: 10px;
+					color:black;
+				}
+
+				border-bottom:1px solid #444;
+				padding:10px;
+				width:100%;
+			}
+
+			ul.dropdownList {
+				display: flex;
+				flex-direction: column;
+				color: white;
+				list-style: none;
+				padding: 0;
+				margin: 0;
+				gap: 1px;
+				width: 200px;
+
+
+				li {
+					flex: 1;
+					display: flex;
+					align-items: center;
+					height: 2em;
+					border: 1px solid #555;
+					border-radius: 5px;
+					background: #333;
+					width: 100%;
+
+					.dropdown {
+						width: 100%;
+
+						.trigger {
+
+							h3 {
+
+								padding-left: 10px;
+								margin: 0;
+							}
+
+						}
+
+						.box {
+							height: 200px;
+						}
+
+						&.active {
+
+							.trigger {
+								border-bottom: 1px solid #777;
+							}
+
+						}
+
+					}
+				}
+			}
+
+		}
+
+		.canvasHolder {
+			margin-inline: auto;
+			width: fit-content;
+			height: fit-content;
+			position: relative;
+			margin-bottom: 70px;
+
+			/* #################   Grid Settings   ###############*/
+			.grid {
+				z-index: -10;
+				--labelWidth: 20px;
+
+				position: absolute;
+				top: -20px;
+				left: -20px;
+				width: calc(100% + var(--labelWidth) *2);
+				color: white;
+				font-size: 12px;
+				font-family: monospace;
+
+				.xLabels {
+					position: absolute;
+					left: 15px;
+					top: -15px;
+					width: 100%;
+					height: var(--labelWidth);
+				}
+
+				.yLabels {
+					width: var(--labelWidth);
+					height: 100%;
+					position: absolute;
+					left: -10px;
+					top: 15px;
+				}
+
+				.labelX, .labelY {
+					position: absolute;
+				}
+
+				.labelX {
+					bottom: 0;
+					width: var(--labelWidth);
+					rotate: -45deg;
+				}
+
+				.labelY {
+					text-align: right;
+					width: var(--labelWidth);
+				}
+			}
+
+			canvas {
+				display: block;
+				margin: 0 auto;
+				background: #ace7af;
+				box-shadow: 1px 4px 14px #000000;
+			}
+		}
+	}
+
+	.redGrid {
+		color: #9900ff00;
+		position: absolute;
+		inset: 0;
+		background: repeating-linear-gradient(90deg, currentColor 0px, currentColor 1px, transparent 0px, transparent 39px, currentColor 39px, currentColor 40px),
+			repeating-linear-gradient(0deg, currentColor 0px, currentColor 1px, transparent 0px, transparent 39px, currentColor 39px, currentColor 40px);
+	}
+}
+
+input, select {
+	border-radius: 5px;
+	background: #fff9ec;
+	height: 2em;
+	outline: 0;
+	border: 2px solid;
+}
