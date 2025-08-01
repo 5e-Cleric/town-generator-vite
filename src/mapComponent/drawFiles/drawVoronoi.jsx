@@ -10,21 +10,23 @@ import {
 	drawShadows,
 } from './drawingHelpers';
 
-function drawVoronoi({
+function drawVoronoi(
 	mode,
-	canvasSize,
-	roadStep,
-	roadWidth,
-	points,
-	spriteScale,
-	numSprites,
-	spriteWidth,
-	spriteHeight,
-	spritesPerRow,
-	houseSheet,
-}) {
-	const canvas = document.getElementById('town');
-	const ctx = canvas.getContext('2d');
+	{
+		canvasSize,
+		roadStep,
+		roadWidth,
+		points,
+		spriteScale,
+		numSprites,
+		spriteWidth,
+		spriteHeight,
+		spritesPerRow,
+		houseSheet,
+	}
+) {
+	const canvasHouses = document.getElementById('houses');
+	const ctxh = canvasHouses.getContext('2d');
 
 	if (!points) return null;
 
@@ -33,16 +35,14 @@ function drawVoronoi({
 	);
 
 	const delaunay = Delaunay.from(voronoiPoints);
-	const voronoi = delaunay.voronoi([0, 0, canvas.width, canvas.height]);
-
-	ctx.clearRect(0, 0, canvasSize, canvasSize);
+	const voronoi = delaunay.voronoi([0, 0, canvasSize, canvasSize]);
 
 	const edges = getEdges(voronoiPoints, voronoi, canvasSize);
-	const housePoints = getHousePoints(edges, canvasSize, spriteHeight, numSprites);
+	const housePoints = getHousePoints(edges, canvasSize, spriteScale, spriteHeight, numSprites);
 
 	const edgesWithAccessRoads = addAccessRoads(edges, housePoints);
-
 	const simplifiedEdges = mergeColinearEdges(edgesWithAccessRoads);
+	drawEdges(simplifiedEdges, roadWidth, canvasSize);
 
 	const sunPosition = 2;
 
@@ -54,15 +54,13 @@ function drawVoronoi({
 		spritesPerRow,
 		houseSheet,
 	};
-
-	drawEdges(simplifiedEdges, roadWidth);
-
+	ctxh.clearRect(0, 0, canvasSize, canvasSize);
 	housePoints.forEach((p) => {
 		drawShadows(p, spriteSettings, sunPosition);
 		drawHouses(p, spriteSettings);
 	});
 
-	//voronoiPoints.forEach(([x, y]) => {ctx.fillRect(x, y, roadStep / 10, roadStep / 10);});
+	//voronoiPoints.forEach(([x, y]) => {ctxr.fillStyle = 'red';ctxr.fillRect(x, y, roadStep / 10, roadStep / 10);});
 }
 
 export default drawVoronoi;

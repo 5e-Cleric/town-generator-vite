@@ -3,13 +3,12 @@ import { useContext, useEffect } from 'react';
 import { MapContext } from './mapContext.jsx';
 import drawNoise from './drawFiles/drawNoise.jsx';
 import drawVoronoi from './drawFiles/drawVoronoi.jsx';
+import { getEdges, drawEdges, drawHouses, drawShadows } from './drawFiles/drawingHelpers.js';
 
 function RenderMapCreator() {
 	const {
 		error,
 		setError,
-		mode,
-		pattern,
 		canvasSize,
 		roadStep,
 		roadWidth,
@@ -24,22 +23,10 @@ function RenderMapCreator() {
 	useEffect(() => {
 		if (!points || points.length === 0) return;
 
-		if (pattern === 'noise') {
-			drawNoise({ mode, canvasSize, roadStep, points });
-		}
-
-		fillGrid();
-	}, [points, pattern]);
-
-	useEffect(() => {
-		if (!points || points.length === 0 || pattern !== 'voronoi') return;
-
 		const houseSheet = new Image();
 		houseSheet.src = '../assets/images/roofs/spritesheet.png';
 		houseSheet.onload = () => {
-			drawVoronoi({
-				mode,
-				pattern,
+			drawVoronoi('all', {
 				canvasSize,
 				roadStep,
 				roadWidth,
@@ -55,13 +42,35 @@ function RenderMapCreator() {
 		houseSheet.onerror = () => {
 			console.error('Image failed to load');
 		};
-	}, [points, pattern]);
+	}, [points, roadWidth]);
+
+	useEffect(() => {
+		const houseSheet = new Image();
+		houseSheet.src = '../assets/images/roofs/spritesheet.png';
+		houseSheet.onload = () => {
+			drawVoronoi('houses', {
+				canvasSize,
+				roadStep,
+				roadWidth,
+				points,
+				spriteScale,
+				numSprites,
+				spriteWidth,
+				spriteHeight,
+				spritesPerRow,
+				houseSheet,
+			});
+		};
+		houseSheet.onerror = () => {
+			console.error('Image failed to load');
+		};
+	},[spriteScale]);
 
 	function fillGrid() {
 		const xLabels = document.querySelector('.grid .xLabels');
 		const yLabels = document.querySelector('.grid .yLabels');
-		const width = 600;
-		const height = 600;
+		const width = canvasSize;
+		const height = canvasSize;
 		const step = 100;
 
 		xLabels.innerHTML = '';
@@ -87,7 +96,7 @@ function RenderMapCreator() {
 	}
 
 	return (
-		<div className="canvasHolder">
+		<div className="canvasHolder" style={{ height: canvasSize, width: canvasSize }}>
 			<div className="grid">
 				<div className="xLabels"></div>
 				<div className="yLabels"></div>
@@ -107,10 +116,11 @@ function RenderMapCreator() {
 			</svg>
 
 			<canvas
-				id="town"
-				width={canvasSize || 600}
-				height={canvasSize || 600}
+				id="roads"
+				height={canvasSize}
+				width={canvasSize}
 				style={{ filter: 'url(#pencil-filter-)' }}></canvas>
+			<canvas id="houses" height={canvasSize} width={canvasSize}></canvas>
 
 			<div className="redGrid"></div>
 		</div>

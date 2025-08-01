@@ -13,8 +13,6 @@ export const MapProvider = ({ children }) => {
 	const spritesPerRow = 8;
 
 	const [mapSettings, setSettings] = useState({
-		mode: 'pattern',
-		pattern: 'voronoi',
 		canvasSize: 600,
 		roadStep: 60,
 		noiseScale: 0.1,
@@ -24,6 +22,8 @@ export const MapProvider = ({ children }) => {
 		numSprites: 8,
 	});
 
+	const { canvasSize, roadStep, noiseScale, roadThreshold } = mapSettings;
+
 	const [points, setPoints] = useState([]);
 
 	const [settingsLoaded, setSettingsLoaded] = useState(false);
@@ -31,8 +31,6 @@ export const MapProvider = ({ children }) => {
 	useEffect(() => {
 		setSettings((prev) => ({
 			...prev,
-			mode: localStorage.getItem('mode') || prev.mode,
-			pattern: localStorage.getItem('pattern') || prev.pattern,
 			canvasSize: parseInt(localStorage.getItem('canvasSize')) || prev.canvasSize,
 			roadStep: parseInt(localStorage.getItem('roadDensity')) || prev.roadStep,
 			roadWidth: parseInt(localStorage.getItem('roadWidth')) || prev.roadWidth,
@@ -45,9 +43,8 @@ export const MapProvider = ({ children }) => {
 
 	useEffect(() => {
 		if (!settingsLoaded) return;
-		const { canvasSize, roadStep, noiseScale, roadThreshold } = mapSettings;
-		const newPoints = [];
 
+		const newPoints = [];
 		for (let x = 0; x < canvasSize; x += roadStep) {
 			for (let y = 0; y < canvasSize; y += roadStep) {
 				const noiseVal = noise2D(x * noiseScale, y * noiseScale);
@@ -57,10 +54,13 @@ export const MapProvider = ({ children }) => {
 			}
 		}
 
+		console.log('reloading points');
 		setPoints(newPoints);
+	}, [canvasSize, roadStep, noiseScale, roadThreshold, settingsLoaded]);
 
-		localStorage.setItem('mode', mapSettings.mode);
-		localStorage.setItem('pattern', mapSettings.pattern);
+	useEffect(() => {
+		if (!settingsLoaded) return;
+
 		localStorage.setItem('canvasSize', mapSettings.canvasSize);
 		localStorage.setItem('roadDensity', mapSettings.roadStep);
 		localStorage.setItem('roadWidth', mapSettings.roadWidth);

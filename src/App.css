@@ -142,7 +142,7 @@ body {
 
 			/* #################   Grid Settings   ###############*/
 			.grid {
-				z-index: -10;
+				z-index: 10;
 				--labelWidth: 20px;
 
 				position: absolute;
@@ -186,17 +186,27 @@ body {
 			}
 
 			canvas {
+				position: absolute;
+				left: 0;
+				top: 0;
 				display: block;
 				margin: 0 auto;
-				background: #92b183;
-				box-shadow: 1px 4px 14px #000000;
+				height:100%;
+				width:100%;
+
+				&:first-of-type {
+					box-shadow: 1px 4px 14px #000000;
+					background: #92b183;
+				}
+
 			}
 		}
 	}
 
 	.redGrid {
-		color: #9900ff00;
+		color: #9900ff4d;
 		position: absolute;
+		z-index: 100;
 		inset: 0;
 		background: repeating-linear-gradient(90deg, currentColor 0px, currentColor 1px, transparent 0px, transparent 39px, currentColor 39px, currentColor 40px),
 			repeating-linear-gradient(0deg, currentColor 0px, currentColor 1px, transparent 0px, transparent 39px, currentColor 39px, currentColor 40px);

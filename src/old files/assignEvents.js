@@ -1,15 +1,3 @@
-const mode = document.getElementById('mode');
-mode.value = localStorage.getItem('mode') || 'pattern';
-mode.addEventListener('change', () => {
-    localStorage.setItem('mode', mode.value);
-    draw();
-});
-
-const pattern = document.getElementById('pattern');
-pattern.value = localStorage.getItem('pattern') || 'noise';
-pattern.addEventListener('change', () => {
-    localStorage.setItem('pattern', pattern.value);
-});
 
 const inputs = document.querySelectorAll('.sidebar input');
 

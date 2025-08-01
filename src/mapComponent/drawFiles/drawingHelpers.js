@@ -99,7 +99,7 @@ export function removeDuplicates(edges) {
 
 export function getHousePoints(edges, canvasSize, spriteHeight, numSprites) {
 	const density = parseFloat(localStorage.getItem('houseDensity')) || 0.1;
-	const minDist = spriteHeight / 3;
+	const minDist = spriteHeight / 5;
 	const offset = spriteHeight / 2;
 	const housePoints = [];
 	const houseEdges = edges.filter((e) => !isBorderEdge(e, canvasSize));
@@ -116,7 +116,7 @@ export function getHousePoints(edges, canvasSize, spriteHeight, numSprites) {
 			return distSquared([x, y], [projX, projY]) < minDistSq;
 		});
 	}
-
+ 
 	for (const { from, to } of houseEdges) {
 		const dx = to[0] - from[0];
 		const dy = to[1] - from[1];
@@ -230,9 +230,11 @@ export function mergeColinearEdges(edges) {
 
 // ############################   Drawing   #############################
 
-export function drawEdges(edges, roadWidth) {
-	const canvas = document.getElementById('town');
+export function drawEdges(edges, roadWidth, canvasSize) {
+	const canvas = document.getElementById('roads');
 	const ctx = canvas.getContext('2d');
+
+	ctx.clearRect(0, 0, canvasSize, canvasSize);
 
 	const lengths = edges.map(({ from, to }) => Math.hypot(to[0] - from[0], to[1] - from[1]));
 
@@ -280,7 +282,7 @@ export function drawShadows(
 	{ spriteScale, numSprites, spriteWidth, spriteHeight, spritesPerRow, houseSheet },
 	sunPosition
 ) {
-	const canvas = document.getElementById('town');
+	const canvas = document.getElementById('houses');
 	const ctx = canvas.getContext('2d');
 
 	const rectW = spriteWidth * spriteScale;
@@ -328,7 +330,7 @@ export function drawHouses(
 	{ x, y, angle, spriteIndex },
 	{ spriteScale, spriteWidth, spriteHeight, spritesPerRow, houseSheet }
 ) {
-	const canvas = document.getElementById('town');
+	const canvas = document.getElementById('houses');
 	const ctx = canvas.getContext('2d');
 
 	const rectW = spriteWidth * spriteScale;
