@@ -42,7 +42,7 @@ function RenderMapCreator() {
 		houseSheet.onerror = () => {
 			console.error('Image failed to load');
 		};
-		fillGrid();
+		//fillGrid();
 	}, [points, roadWidth]);
 
 	useEffect(() => {
@@ -123,7 +123,8 @@ function RenderMapCreator() {
 				style={{ filter: 'url(#pencil-filter-)' }}></canvas>
 			<canvas id="houses" height={canvasSize} width={canvasSize}></canvas>
 
-			<div className="redGrid"></div>
+			{//<div className="redGrid"></div>
+			}
 		</div>
 	);
 }

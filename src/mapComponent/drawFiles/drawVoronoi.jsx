@@ -62,7 +62,7 @@ function drawVoronoi(
 		drawHouses(p, spriteSettings);
 	});
 
-	voronoiPoints.forEach(([x, y]) => {ctxh.fillStyle = 'red';ctxh.fillRect(x, y, roadStep / 10, roadStep / 10);});
+	//voronoiPoints.forEach(([x, y]) => {ctxh.fillStyle = 'red';ctxh.fillRect(x, y, roadStep / 10, roadStep / 10);});
 }
 
 export default drawVoronoi;
