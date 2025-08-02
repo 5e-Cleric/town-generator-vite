@@ -28,7 +28,7 @@ function drawVoronoi(
 	const canvasHouses = document.getElementById('houses');
 	const ctxh = canvasHouses.getContext('2d');
 
-	if (!points) return null;
+	if (!points || points.length === 0) return null;
 
 	const voronoiPoints = points.filter(
 		([x, y]) => x > roadStep && x < canvasSize - roadStep && y > roadStep && y < canvasSize - roadStep
@@ -36,6 +36,8 @@ function drawVoronoi(
 
 	const delaunay = Delaunay.from(voronoiPoints);
 	const voronoi = delaunay.voronoi([0, 0, canvasSize, canvasSize]);
+
+	console.log(voronoi);
 
 	const edges = getEdges(voronoiPoints, voronoi, canvasSize);
 	const housePoints = getHousePoints(edges, canvasSize, spriteScale, spriteHeight, numSprites);
@@ -60,7 +62,7 @@ function drawVoronoi(
 		drawHouses(p, spriteSettings);
 	});
 
-	//voronoiPoints.forEach(([x, y]) => {ctxr.fillStyle = 'red';ctxr.fillRect(x, y, roadStep / 10, roadStep / 10);});
+	voronoiPoints.forEach(([x, y]) => {ctxh.fillStyle = 'red';ctxh.fillRect(x, y, roadStep / 10, roadStep / 10);});
 }
 
 export default drawVoronoi;

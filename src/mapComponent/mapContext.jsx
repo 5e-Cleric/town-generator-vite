@@ -54,7 +54,6 @@ export const MapProvider = ({ children }) => {
 			}
 		}
 
-		console.log('reloading points');
 		setPoints(newPoints);
 	}, [canvasSize, roadStep, noiseScale, roadThreshold, settingsLoaded]);
 

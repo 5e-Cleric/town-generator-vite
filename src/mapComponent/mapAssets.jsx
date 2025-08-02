@@ -14,6 +14,11 @@ const roofAssets = [
 function RenderMapAssets() {
 	return (
 		<aside className="sidebar">
+			<h2>
+				This app is <br />
+				still in development
+			</h2>
+			{/*
 			<h2>Assets</h2>
 			<ul className="dropdownList">
 				<li>
@@ -49,6 +54,7 @@ function RenderMapAssets() {
 					</div>
 				</li>
 			</ul>
+			*/}
 		</aside>
 	);
 }

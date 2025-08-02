@@ -42,6 +42,7 @@ function RenderMapCreator() {
 		houseSheet.onerror = () => {
 			console.error('Image failed to load');
 		};
+		fillGrid();
 	}, [points, roadWidth]);
 
 	useEffect(() => {
@@ -64,7 +65,7 @@ function RenderMapCreator() {
 		houseSheet.onerror = () => {
 			console.error('Image failed to load');
 		};
-	},[spriteScale]);
+	}, [spriteScale]);
 
 	function fillGrid() {
 		const xLabels = document.querySelector('.grid .xLabels');

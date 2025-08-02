@@ -99,8 +99,10 @@ export function removeDuplicates(edges) {
 
 export function getHousePoints(edges, canvasSize, spriteHeight, numSprites) {
 	const density = parseFloat(localStorage.getItem('houseDensity')) || 0.1;
-	const minDist = spriteHeight / 5;
-	const offset = spriteHeight / 2;
+	const minDist = Math.round(spriteHeight * 50);
+	const offset = Math.round(spriteHeight * 50);
+	//ideally values around 30
+
 	const housePoints = [];
 	const houseEdges = edges.filter((e) => !isBorderEdge(e, canvasSize));
 
@@ -116,7 +118,7 @@ export function getHousePoints(edges, canvasSize, spriteHeight, numSprites) {
 			return distSquared([x, y], [projX, projY]) < minDistSq;
 		});
 	}
- 
+
 	for (const { from, to } of houseEdges) {
 		const dx = to[0] - from[0];
 		const dy = to[1] - from[1];
@@ -301,7 +303,7 @@ export function drawShadows(
 
 	corners = ensureClockwise(corners);
 
-	const shadowLength = 10;
+	const shadowLength = spriteScale * 10;
 	const sunVec = {
 		x: Math.cos(sunPosition),
 		y: Math.sin(sunPosition),
@@ -343,6 +345,7 @@ export function drawHouses(
 	ctx.save();
 	ctx.translate(x, y);
 	ctx.rotate(angle);
+	ctx.imageSmoothingEnabled = true;
 	ctx.drawImage(houseSheet, sx, sy, spriteWidth, spriteHeight, rectX, rectY, rectW, rectH);
 	ctx.restore();
 }

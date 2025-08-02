@@ -2,8 +2,7 @@ import { useContext } from 'react';
 import { MapContext } from './mapContext.jsx';
 
 function RenderMapSettings() {
-	const { canvasSize, roadStep, roadWidth, spriteScale, setSettings } =
-		useContext(MapContext);
+	const { canvasSize, roadStep, roadWidth, spriteScale, setSettings } = useContext(MapContext);
 
 	function handleChange(e) {
 		const { id, value } = e.target;
@@ -18,7 +17,6 @@ function RenderMapSettings() {
 		<aside className="sidebar">
 			<h2>Generator Settings</h2>
 			<form id="settings">
-				
 				<label>
 					<p>Canvas Size:</p>
 					<input type="number" id="canvasSize" value={canvasSize} onChange={handleChange} />
@@ -31,7 +29,7 @@ function RenderMapSettings() {
 						id="roadStep"
 						min="10"
 						max="100"
-						step='1'
+						step="1"
 						value={100 - roadStep}
 						onChange={handleChange}
 					/>
