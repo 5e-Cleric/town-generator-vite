@@ -24,7 +24,7 @@ function RenderMapCreator() {
 		if (!points || points.length === 0) return;
 
 		const houseSheet = new Image();
-		houseSheet.src = '/assets/images/roofs/spritesheet.png';
+		houseSheet.src = 'assets/images/roofs/spritesheet.png';
 		houseSheet.onload = () => {
 			drawVoronoi('all', {
 				canvasSize,
