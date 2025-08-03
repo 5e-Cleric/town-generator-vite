@@ -1,13 +1,16 @@
 {
   "name": "town-generator-vite",
+  "homepage": "https://5e-cleric.github.io/town-generator-vite/",
   "private": true,
-  "version": "1.0.0",
+  "version": "2.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy" : "gh-pages -d dist"
   },
   "dependencies": {
     "react": "^19.1.0",
