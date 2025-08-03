@@ -47,7 +47,7 @@ function RenderMapCreator() {
 
 	useEffect(() => {
 		const houseSheet = new Image();
-		houseSheet.src = '../assets/images/roofs/spritesheet.png';
+		houseSheet.src = 'assets/images/roofs/spritesheet.png';
 		houseSheet.onload = () => {
 			drawVoronoi('houses', {
 				canvasSize,
