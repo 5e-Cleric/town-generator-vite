@@ -100,7 +100,7 @@ export function removeDuplicates(edges) {
 export function getHousePoints(edges, canvasSize, spriteHeight, numSprites) {
 	const density = parseFloat(localStorage.getItem('houseDensity')) || 0.1;
 	const minDist = Math.round(spriteHeight * 50);
-	const offset = Math.round(spriteHeight * 50);
+	const offset = Math.round(spriteHeight * 50 + 5);
 	//ideally values around 30
 
 	const housePoints = [];
@@ -235,36 +235,117 @@ export function mergeColinearEdges(edges) {
 export function drawEdges(edges, roadWidth, canvasSize) {
 	const canvas = document.getElementById('roads');
 	const ctx = canvas.getContext('2d');
-
 	ctx.clearRect(0, 0, canvasSize, canvasSize);
 
-	const lengths = edges.map(({ from, to }) => Math.hypot(to[0] - from[0], to[1] - from[1]));
-
-	const minLen = Math.min(...lengths);
-	const maxLen = Math.max(...lengths);
-
 	edges.forEach(({ from, to }, i) => {
-		const norm = (lengths[i] - minLen) / (maxLen - minLen || 1);
 		ctx.beginPath();
 		ctx.moveTo(from[0], from[1]);
 		ctx.lineTo(to[0], to[1]);
 		ctx.strokeStyle = '#809070';
 		ctx.lineCap = 'round';
-		ctx.lineJoin = 'mitter';
-		ctx.lineWidth = roadWidth * 10 * (0.03 + norm * 0.07) + 4;
+		ctx.lineJoin = 'round';
+		ctx.lineWidth = roadWidth + 4;
 		ctx.stroke();
 	});
+	drawEdgeCorners(edges, roadWidth + 2, '#809070', ctx);
 
-	edges.forEach(({ from, to }, i) => {
-		const norm = (lengths[i] - minLen) / (maxLen - minLen || 1);
-		ctx.beginPath();
-		ctx.moveTo(from[0], from[1]);
-		ctx.lineTo(to[0], to[1]);
-		ctx.strokeStyle = '#d8d1bc';
-		ctx.lineCap = 'round';
-		ctx.lineJoin = 'mitter';
-		ctx.lineWidth = roadWidth * 10 * (0.03 + norm * 0.07);
-		ctx.stroke();
+	const tempCanvas = document.createElement('canvas');
+	tempCanvas.width = canvasSize;
+	tempCanvas.height = canvasSize;
+	const tempCtx = tempCanvas.getContext('2d');
+
+	edges.forEach(({ from, to }) => {
+		tempCtx.beginPath();
+		tempCtx.moveTo(from[0], from[1]);
+		tempCtx.lineTo(to[0], to[1]);
+		tempCtx.strokeStyle = '#d8d1bc';
+		tempCtx.lineCap = 'round';
+		tempCtx.lineJoin = 'mitter';
+		tempCtx.lineWidth = roadWidth;
+		tempCtx.stroke();
+	});
+	drawEdgeCorners(edges, roadWidth, '#d8d1bc', tempCtx);
+
+	ctx.drawImage(tempCanvas, 0, 0);
+}
+
+function drawEdgeCorners(edges, roadWidth, edgeColor, ctx) {
+	console.log('getting corners');
+
+	const points = Array.from(new Set(edges.flatMap((e) => [JSON.stringify(e.from), JSON.stringify(e.to)]))).map(
+		(str) => JSON.parse(str)
+	);
+
+	points.forEach((point) => {
+		const connectedEdges = edges.filter(
+			(e) => (e.from[0] === point[0] && e.from[1] === point[1]) || (e.to[0] === point[0] && e.to[1] === point[1])
+		);
+
+		if (connectedEdges.length < 2) return;
+
+		// sort edges by angle for clockwise order
+		const angles = connectedEdges.map((e) => {
+			const other = e.from[0] === point[0] && e.from[1] === point[1] ? e.to : e.from;
+			const angle = Math.atan2(other[1] - point[1], other[0] - point[0]);
+			return { edge: e, other, angle };
+		});
+		angles.sort((a, b) => a.angle - b.angle);
+
+		for (let i = 0; i < angles.length; i++) {
+			const curr = angles[i].other;
+			const next = angles[(i + 1) % angles.length].other;
+
+			// skip if these two points are directly connected by an edge
+			const isDirect = edges.some(
+				(e) =>
+					(e.from[0] === curr[0] && e.from[1] === curr[1] && e.to[0] === next[0] && e.to[1] === next[1]) ||
+					(e.from[0] === next[0] && e.from[1] === next[1] && e.to[0] === curr[0] && e.to[1] === curr[1])
+			);
+			if (isDirect) continue;
+
+			const angle1 = Math.atan2(curr[1] - point[1], curr[0] - point[0]);
+			const angle2 = Math.atan2(next[1] - point[1], next[0] - point[0]);
+
+			let bisectAngle = (angle1 + angle2) / 2;
+			// Handle angle wrap-around
+			if (Math.abs(angle1 - angle2) > Math.PI) {
+				bisectAngle += Math.PI;
+			}
+			let angleDiff = Math.abs(angle2 - angle1);
+			if (Math.abs(angleDiff - Math.PI) < 0.5) continue; // skip near 180deg angles
+			if (angleDiff > Math.PI) angleDiff = 2 * Math.PI - angleDiff;
+
+			const scale = 1 / Math.sin(angleDiff / 2);
+			const scaleCircles = 1 / Math.sin(angleDiff / 1.55);
+			const dist = roadWidth * 0.7 * scale;
+			const distCircles = roadWidth * 0.7 * scaleCircles;
+			const removeRadius = (roadWidth * 0.8) / scaleCircles;
+
+			const mid = [point[0] + Math.cos(bisectAngle) * dist, point[1] + Math.sin(bisectAngle) * dist];
+			const circlePoint = [
+				point[0] + Math.cos(bisectAngle) * distCircles * 2,
+				point[1] + Math.sin(bisectAngle) * distCircles * 2,
+			];
+
+			ctx.beginPath();
+			ctx.globalCompositeOperation = 'sourceOver';
+			ctx.strokeStyle = edgeColor;
+			ctx.stroke;
+			ctx.moveTo(point[0], point[1]);
+			ctx.lineTo(mid[0], mid[1]);
+			ctx.lineCap = 'butt';
+			ctx.lineWidth = roadWidth;
+			ctx.stroke();
+
+			ctx.save();
+			ctx.globalCompositeOperation = 'destination-out';
+			ctx.beginPath();
+			ctx.arc(circlePoint[0], circlePoint[1], removeRadius, 0, Math.PI * 2);
+			ctx.fillStyle = '#ff000040';
+			ctx.fill();
+			ctx.restore();
+			ctx.save();
+		}
 	});
 }
 

@@ -3,7 +3,6 @@ import { useContext, useEffect } from 'react';
 import { MapContext } from './mapContext.jsx';
 import drawNoise from './drawFiles/drawNoise.jsx';
 import drawVoronoi from './drawFiles/drawVoronoi.jsx';
-import { getEdges, drawEdges, drawHouses, drawShadows } from './drawFiles/drawingHelpers.js';
 
 function RenderMapCreator() {
 	const {

@@ -41,8 +41,10 @@ function drawVoronoi(
 	const housePoints = getHousePoints(edges, canvasSize, spriteScale, spriteHeight, numSprites);
 
 	const edgesWithAccessRoads = addAccessRoads(edges, housePoints);
-	const simplifiedEdges = mergeColinearEdges(edgesWithAccessRoads);
-	drawEdges(simplifiedEdges, roadWidth, canvasSize);
+	//const simplifiedEdges = mergeColinearEdges(edgesWithAccessRoads);
+	drawEdges(edgesWithAccessRoads, roadWidth, canvasSize);
+
+	//drawEdgeCorners(edgesWithAccessRoads, roadWidth);
 
 	const sunPosition = 2;
 
