@@ -37,8 +37,6 @@ function drawVoronoi(
 	const delaunay = Delaunay.from(voronoiPoints);
 	const voronoi = delaunay.voronoi([0, 0, canvasSize, canvasSize]);
 
-	console.log(voronoi);
-
 	const edges = getEdges(voronoiPoints, voronoi, canvasSize);
 	const housePoints = getHousePoints(edges, canvasSize, spriteScale, spriteHeight, numSprites);
 
