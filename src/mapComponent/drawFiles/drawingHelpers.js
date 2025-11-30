@@ -159,7 +159,7 @@ export function getHousePoints(edges, canvasSize, spriteHeight, numSprites) {
 	return housePoints;
 }
 
-export function addAccessRoads(edges, housePoints) {
+export function getAccessRoads(edges, housePoints) {
 	const accessRoads = [];
 
 	for (const house of housePoints) {
@@ -186,7 +186,7 @@ export function addAccessRoads(edges, housePoints) {
 		}
 	}
 
-	return edges.concat(accessRoads);
+	return accessRoads;
 }
 
 export function mergeColinearEdges(edges) {
@@ -302,22 +302,20 @@ export function drawBackground(canvasSize) {
 }
 
 
-export function drawEdges(edges, roadWidth, canvasSize) {
+export function drawEdges(edges, accessRoads, roadWidth, canvasSize) {
 	const canvas = document.getElementById('roads');
 	const ctx = canvas.getContext('2d');
 	ctx.clearRect(0, 0, canvasSize, canvasSize);
 
 	edges.forEach(({ from, to }, i) => {
-		ctx.beginPath();
-		ctx.moveTo(from[0], from[1]);
-		ctx.lineTo(to[0], to[1]);
-		ctx.strokeStyle = '#809070';
-		ctx.lineCap = 'round';
-		ctx.lineJoin = 'round';
-		ctx.lineWidth = roadWidth + 4;
-		ctx.stroke();
+		drawEdge(ctx, from[0], from[1], to[0], to[1], roadWidth + 4, '#809070');
 	});
+
 	drawEdgeCorners(edges, roadWidth + 2, '#809070', ctx);
+
+	accessRoads.forEach(({ from, to }, i) => {
+		drawEdge(ctx, from[0], from[1], to[0], to[1], (roadWidth + 4)/2, '#809070');
+	});
 
 	const tempCanvas = document.createElement('canvas');
 	tempCanvas.width = canvasSize;
@@ -325,16 +323,24 @@ export function drawEdges(edges, roadWidth, canvasSize) {
 	const tempCtx = tempCanvas.getContext('2d');
 
 	edges.forEach(({ from, to }) => {
-		tempCtx.beginPath();
-		tempCtx.moveTo(from[0], from[1]);
-		tempCtx.lineTo(to[0], to[1]);
-		tempCtx.strokeStyle = '#d8d1bc';
-		tempCtx.lineCap = 'round';
-		tempCtx.lineJoin = 'round';
-		tempCtx.lineWidth = roadWidth;
-		tempCtx.stroke();
+		drawEdge(tempCtx, from[0], from[1], to[0], to[1], roadWidth, '#d8d1bc');
 	});
 	drawEdgeCorners(edges, roadWidth, '#d8d1bc', tempCtx);
+
+	accessRoads.forEach(({ from, to }, i) => {
+		drawEdge(tempCtx, from[0], from[1], to[0], to[1], roadWidth /2, '#d8d1bc');
+	});
+
+	function drawEdge (canvas, x0, y0, x1, y1, width, color) {
+		canvas.beginPath();
+		canvas.moveTo(x0, y0);
+		canvas.lineTo(x1, y1);
+		canvas.strokeStyle = color;
+		canvas.lineCap = 'round';
+		canvas.lineJoin = 'round';
+		canvas.lineWidth = width;
+		canvas.stroke();
+	}
 
 	ctx.drawImage(tempCanvas, 0, 0);
 }

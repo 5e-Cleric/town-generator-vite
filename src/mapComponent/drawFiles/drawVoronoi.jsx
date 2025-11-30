@@ -3,7 +3,7 @@ import { Delaunay } from 'https://cdn.jsdelivr.net/npm/d3-delaunay@6/+esm';
 import {
 	getEdges,
 	getHousePoints,
-	addAccessRoads,
+	getAccessRoads,
 	drawBackground,
 	drawEdges,
 	drawHouses,
@@ -42,9 +42,9 @@ function drawVoronoi(
 	const edges = getEdges(voronoiPoints, voronoi, canvasSize);
 	const housePoints = getHousePoints(edges, canvasSize, spriteScale, spriteHeight, numSprites);
 
-	const edgesWithAccessRoads = addAccessRoads(edges, housePoints);
+	const accessRoads = getAccessRoads(edges, housePoints);
 	//const simplifiedEdges = mergeColinearEdges(edgesWithAccessRoads);
-	drawEdges(edgesWithAccessRoads, roadWidth, canvasSize);
+	drawEdges(edges, accessRoads, roadWidth, canvasSize);
 
 	//drawEdgeCorners(edgesWithAccessRoads, roadWidth);
 
