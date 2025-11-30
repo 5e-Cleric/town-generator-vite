@@ -140,6 +140,13 @@ body {
 			position: relative;
 			margin-bottom: 70px;
 
+			&::after {
+				content:'';
+				background:radial-gradient(circle at 50%, transparent , #00000000 300px, #0000003f 500px);
+				position:absolute;
+				inset:0;
+			}
+
 			/* #################   Grid Settings   ###############*/
 			.grid {
 				z-index: 10;
@@ -196,7 +203,7 @@ body {
 
 				&:first-of-type {
 					box-shadow: 1px 4px 14px #000000;
-					background: #92b183;
+					
 				}
 
 			}

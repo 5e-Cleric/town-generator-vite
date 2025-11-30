@@ -4,7 +4,7 @@ import {
 	getEdges,
 	getHousePoints,
 	addAccessRoads,
-	mergeColinearEdges,
+	drawBackground,
 	drawEdges,
 	drawHouses,
 	drawShadows,
@@ -29,6 +29,8 @@ function drawVoronoi(
 	const ctxh = canvasHouses.getContext('2d');
 
 	if (!points || points.length === 0) return null;
+
+	drawBackground(canvasSize);
 
 	const voronoiPoints = points.filter(
 		([x, y]) => x > roadStep && x < canvasSize - roadStep && y > roadStep && y < canvasSize - roadStep
@@ -57,7 +59,7 @@ function drawVoronoi(
 		houseSheet,
 	};
 	ctxh.clearRect(0, 0, canvasSize, canvasSize);
-	housePoints.forEach((p) => {
+	housePoints.forEach((p, i) => {
 		drawShadows(p, spriteSettings, sunPosition);
 		drawHouses(p, spriteSettings);
 	});

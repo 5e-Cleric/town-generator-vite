@@ -13,7 +13,8 @@ function App() {
 				<MapProvider>
 					<RenderMapSettings />
 					<RenderMapCreator />
-					<RenderMapAssets />
+					{//<RenderMapAssets />
+					}
 				</MapProvider>
 			</main>
 		</>

@@ -3,8 +3,6 @@ function drawNoise({ canvasSize, roadStep, roadWidth, points, spriteScale, numSp
 	const ctx = canvas.getContext('2d');
 
 
-
-
 	//points are interpreted all over the tool as objects, and some places as arrays 
 
 	ctx.clearRect(0, 0, canvasSize, canvasSize);

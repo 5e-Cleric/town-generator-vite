@@ -1,3 +1,5 @@
+import { createNoise2D } from 'simplex-noise';
+
 export function pointsEqual(a, b) {
 	return a[0] === b[0] && a[1] === b[1];
 }
@@ -232,6 +234,74 @@ export function mergeColinearEdges(edges) {
 
 // ############################   Drawing   #############################
 
+
+export function drawBackground(canvasSize) {
+	const canvas = document.getElementById('background');
+	const ctx = canvas.getContext('2d');
+
+	const noise2D = createNoise2D();
+	const step = 1;
+	const noiseScale = 0.001;
+
+	const colorDark = '#80a070';
+	const colorMid = '#90b080';
+	const colorBright = '#a0c090';
+
+	function hexToRgb(hex) {
+		const bigint = parseInt(hex.slice(1), 16);
+		return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255];
+	}
+
+	function lerpColor(a, b, t) {
+		return a.map((v, i) => Math.floor(v + (b[i] - v) * t));
+	}
+
+	function toHex([r, g, b]) {
+		return `#${[r, g, b].map((c) => c.toString(16).padStart(2, '0')).join('')}`;
+	}
+
+	const rgbDark = hexToRgb(colorDark);
+	const rgbMid = hexToRgb(colorMid);
+	const rgbBright = hexToRgb(colorBright);
+
+	const scale = 4;
+	const lowRes = canvasSize / scale;
+	const offCanvas = document.createElement('canvas');
+	offCanvas.width = offCanvas.height = lowRes;
+	const offCtx = offCanvas.getContext('2d');
+	const imageData = offCtx.createImageData(lowRes, lowRes);
+	const data = imageData.data;
+
+	for (let x = 0; x < lowRes; x++) {
+		for (let y = 0; y < lowRes; y++) {
+			const idx = (y * lowRes + x) * 4;
+			const noiseVal = noise2D(x * noiseScale * scale, y * noiseScale * scale);
+
+			let base, target, blend;
+			if (noiseVal < 0.5) {
+				base = rgbDark;
+				target = rgbMid;
+				blend = noiseVal * 2;
+			} else {
+				base = rgbMid;
+				target = rgbBright;
+				blend = (noiseVal - 0.5) * 2;
+			}
+
+			const [r, g, b] = lerpColor(base, target, blend);
+			data[idx] = r;
+			data[idx + 1] = g;
+			data[idx + 2] = b;
+			data[idx + 3] = 255;
+		}
+	}
+
+	offCtx.putImageData(imageData, 0, 0);
+	ctx.imageSmoothingEnabled = false;
+	ctx.drawImage(offCanvas, 0, 0, canvasSize, canvasSize);
+}
+
+
 export function drawEdges(edges, roadWidth, canvasSize) {
 	const canvas = document.getElementById('roads');
 	const ctx = canvas.getContext('2d');
@@ -260,7 +330,7 @@ export function drawEdges(edges, roadWidth, canvasSize) {
 		tempCtx.lineTo(to[0], to[1]);
 		tempCtx.strokeStyle = '#d8d1bc';
 		tempCtx.lineCap = 'round';
-		tempCtx.lineJoin = 'mitter';
+		tempCtx.lineJoin = 'round';
 		tempCtx.lineWidth = roadWidth;
 		tempCtx.stroke();
 	});

@@ -115,6 +115,7 @@ function RenderMapCreator() {
 				</filter>
 			</svg>
 
+			<canvas id="background" height={canvasSize} width={canvasSize}></canvas>
 			<canvas
 				id="roads"
 				height={canvasSize}
@@ -122,7 +123,8 @@ function RenderMapCreator() {
 				style={{ filter: 'url(#pencil-filter-)' }}></canvas>
 			<canvas id="houses" height={canvasSize} width={canvasSize}></canvas>
 
-			{//<div className="redGrid"></div>
+			{
+				//<div className="redGrid"></div>
 			}
 		</div>
 	);
