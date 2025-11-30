@@ -4,9 +4,11 @@ import { MapContext } from './mapContext.jsx';
 function RenderMapSettings() {
 	const { canvasSize, roadStep, roadWidth, spriteScale, setSettings } = useContext(MapContext);
 
+	const roadStepMaximum = 100;
+
 	function handleChange(e) {
 		const { id, value } = e.target;
-		const newValue = id === 'roadStep' ? 100 - Number(value) : isNaN(value) ? value : Number(value);
+		const newValue = id === 'roadStep' ? roadStepMaximum - Number(value) : isNaN(value) ? value : Number(value);
 		setSettings((prev) => ({
 			...prev,
 			[id]: newValue,
@@ -28,7 +30,7 @@ function RenderMapSettings() {
 						type="range"
 						id="roadStep"
 						min="10"
-						max="100"
+						max={roadStepMaximum.toString()}
 						step="1"
 						value={100 - roadStep}
 						onChange={handleChange}

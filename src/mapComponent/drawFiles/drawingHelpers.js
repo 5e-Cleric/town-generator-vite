@@ -346,7 +346,6 @@ export function drawEdges(edges, accessRoads, roadWidth, canvasSize) {
 }
 
 function drawEdgeCorners(edges, roadWidth, edgeColor, ctx) {
-	console.log('getting corners');
 
 	const points = Array.from(new Set(edges.flatMap((e) => [JSON.stringify(e.from), JSON.stringify(e.to)]))).map(
 		(str) => JSON.parse(str)
