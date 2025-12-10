@@ -1,14 +1,15 @@
-import { useContext } from 'react';
-import { MapContext } from './mapContext.jsx';
+import { useContext } from "react";
+import { MapContext } from "./mapContext.jsx";
 
 function RenderMapSettings() {
-	const { canvasSize, roadStep, roadWidth, spriteScale, setSettings } = useContext(MapContext);
+	const { canvasSize, roadStep, roadWidth, roadRadius, spriteScale, setSettings } = useContext(MapContext);
 
-	const roadStepMaximum = 100;
+	const roadStepMaximum = 180;
 
 	function handleChange(e) {
 		const { id, value } = e.target;
-		const newValue = id === 'roadStep' ? roadStepMaximum - Number(value) : isNaN(value) ? value : Number(value);
+		console.log(value);
+		const newValue = id === "roadStep" ? roadStepMaximum - Number(value) : isNaN(value) ? value : Number(value);
 		setSettings((prev) => ({
 			...prev,
 			[id]: newValue,
@@ -32,7 +33,7 @@ function RenderMapSettings() {
 						min="10"
 						max={roadStepMaximum.toString()}
 						step="1"
-						value={100 - roadStep}
+						value={roadStepMaximum - roadStep}
 						onChange={handleChange}
 					/>
 				</label>
@@ -46,6 +47,19 @@ function RenderMapSettings() {
 						max="20"
 						step="0.1"
 						value={roadWidth}
+						onChange={handleChange}
+					/>
+				</label>
+
+				<label>
+					<p>Road Radius:</p>
+					<input
+						type="range"
+						id="roadRadius"
+						min="1"
+						max="20"
+						step="0.1"
+						value={roadRadius}
 						onChange={handleChange}
 					/>
 				</label>

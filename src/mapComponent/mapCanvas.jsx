@@ -11,6 +11,7 @@ function RenderMapCreator() {
 		canvasSize,
 		roadStep,
 		roadWidth,
+		roadRadius,
 		points,
 		spriteScale,
 		numSprites,
@@ -29,6 +30,7 @@ function RenderMapCreator() {
 				canvasSize,
 				roadStep,
 				roadWidth,
+				roadRadius,
 				points,
 				spriteScale,
 				numSprites,
@@ -42,7 +44,7 @@ function RenderMapCreator() {
 			console.error('Image failed to load');
 		};
 		//fillGrid();
-	}, [points, roadWidth]);
+	}, [points, roadWidth,roadRadius]);
 
 	useEffect(() => {
 		const houseSheet = new Image();
@@ -52,6 +54,7 @@ function RenderMapCreator() {
 				canvasSize,
 				roadStep,
 				roadWidth,
+				roadRadius,
 				points,
 				spriteScale,
 				numSprites,
@@ -124,7 +127,7 @@ function RenderMapCreator() {
 			<canvas id="houses" height={canvasSize} width={canvasSize}></canvas>
 
 			{
-				//<div className="redGrid"></div>
+			//	<div className="redGrid"></div>
 			}
 		</div>
 	);

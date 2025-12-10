@@ -18,11 +18,12 @@ export const MapProvider = ({ children }) => {
 		noiseScale: 0.1,
 		roadThreshold: 0,
 		roadWidth: 10,
+		roadRadius: 10,
 		spriteScale: 0.5,
 		numSprites: 8,
 	});
 
-	const { canvasSize, roadStep, noiseScale, roadThreshold } = mapSettings;
+	const { canvasSize, roadStep, roadRadius, noiseScale, roadThreshold } = mapSettings;
 
 	const [points, setPoints] = useState([]);
 
@@ -34,6 +35,7 @@ export const MapProvider = ({ children }) => {
 			canvasSize: parseInt(localStorage.getItem('canvasSize')) || prev.canvasSize,
 			roadStep: parseInt(localStorage.getItem('roadDensity')) || prev.roadStep,
 			roadWidth: parseInt(localStorage.getItem('roadWidth')) || prev.roadWidth,
+			roadRadius: parseInt(localStorage.getItem('roadWidth')) || prev.roadRadius,
 			spriteScale: parseFloat(localStorage.getItem('houseSize')) || prev.spriteScale,
 			numSprites: prev.numSprites,
 		}));
@@ -63,6 +65,7 @@ export const MapProvider = ({ children }) => {
 		localStorage.setItem('canvasSize', mapSettings.canvasSize);
 		localStorage.setItem('roadDensity', mapSettings.roadStep);
 		localStorage.setItem('roadWidth', mapSettings.roadWidth);
+		localStorage.setItem('roadRadius', mapSettings.roadRadius);
 		localStorage.setItem('houseSize', mapSettings.spriteScale);
 	}, [mapSettings, settingsLoaded]);
 

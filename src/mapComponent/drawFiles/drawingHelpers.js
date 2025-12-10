@@ -1,4 +1,4 @@
-import { createNoise2D } from 'simplex-noise';
+import { createNoise2D } from "simplex-noise";
 
 export function pointsEqual(a, b) {
 	return a[0] === b[0] && a[1] === b[1];
@@ -100,7 +100,7 @@ export function removeDuplicates(edges) {
 }
 
 export function getHousePoints(edges, canvasSize, spriteHeight, numSprites) {
-	const density = parseFloat(localStorage.getItem('houseDensity')) || 0.1;
+	const density = parseFloat(localStorage.getItem("houseDensity")) || 0.1;
 	const minDist = Math.round(spriteHeight * 50);
 	const offset = Math.round(spriteHeight * 50 + 5);
 	//ideally values around 30
@@ -234,18 +234,17 @@ export function mergeColinearEdges(edges) {
 
 // ############################   Drawing   #############################
 
-
 export function drawBackground(canvasSize) {
-	const canvas = document.getElementById('background');
-	const ctx = canvas.getContext('2d');
+	const canvas = document.getElementById("background");
+	const ctx = canvas.getContext("2d");
 
 	const noise2D = createNoise2D();
 	const step = 1;
 	const noiseScale = 0.001;
 
-	const colorDark = '#80a070';
-	const colorMid = '#90b080';
-	const colorBright = '#a0c090';
+	const colorDark = "#80a070";
+	const colorMid = "#90b080";
+	const colorBright = "#a0c090";
 
 	function hexToRgb(hex) {
 		const bigint = parseInt(hex.slice(1), 16);
@@ -257,7 +256,7 @@ export function drawBackground(canvasSize) {
 	}
 
 	function toHex([r, g, b]) {
-		return `#${[r, g, b].map((c) => c.toString(16).padStart(2, '0')).join('')}`;
+		return `#${[r, g, b].map((c) => c.toString(16).padStart(2, "0")).join("")}`;
 	}
 
 	const rgbDark = hexToRgb(colorDark);
@@ -265,10 +264,10 @@ export function drawBackground(canvasSize) {
 	const rgbBright = hexToRgb(colorBright);
 
 	const scale = 4;
-	const lowRes = canvasSize / scale;
-	const offCanvas = document.createElement('canvas');
+	const lowRes = Math.round(canvasSize / scale);
+	const offCanvas = document.createElement("canvas");
 	offCanvas.width = offCanvas.height = lowRes;
-	const offCtx = offCanvas.getContext('2d');
+	const offCtx = offCanvas.getContext("2d");
 	const imageData = offCtx.createImageData(lowRes, lowRes);
 	const data = imageData.data;
 
@@ -301,51 +300,53 @@ export function drawBackground(canvasSize) {
 	ctx.drawImage(offCanvas, 0, 0, canvasSize, canvasSize);
 }
 
-
-export function drawEdges(edges, accessRoads, roadWidth, canvasSize) {
-	const canvas = document.getElementById('roads');
-	const ctx = canvas.getContext('2d');
+export function drawEdges(edges, accessRoads, roadWidth, roadRadius, canvasSize) {
+	const canvas = document.getElementById("roads");
+	const ctx = canvas.getContext("2d");
 	ctx.clearRect(0, 0, canvasSize, canvasSize);
 
 	edges.forEach(({ from, to }, i) => {
-		drawEdge(ctx, from[0], from[1], to[0], to[1], roadWidth + 4, '#809070');
+		drawEdge(ctx, from[0], from[1], to[0], to[1], roadWidth + 4, "#809070");
 	});
 
-	drawEdgeCorners(edges, roadWidth + 2, '#809070', ctx);
+	roadRadius > 2 && drawEdgeCorners(edges, roadWidth + 3, roadRadius, "#809070", ctx);
 
 	accessRoads.forEach(({ from, to }, i) => {
-		drawEdge(ctx, from[0], from[1], to[0], to[1], (roadWidth + 4)/2, '#809070');
+		drawEdge(ctx, from[0], from[1], to[0], to[1], (roadWidth + 4) / 2, "#809070");
 	});
 
-	const tempCanvas = document.createElement('canvas');
+	const tempCanvas = document.createElement("canvas");
 	tempCanvas.width = canvasSize;
 	tempCanvas.height = canvasSize;
-	const tempCtx = tempCanvas.getContext('2d');
+	const tempCtx = tempCanvas.getContext("2d");
 
 	edges.forEach(({ from, to }) => {
-		drawEdge(tempCtx, from[0], from[1], to[0], to[1], roadWidth, '#d8d1bc');
+		drawEdge(tempCtx, from[0], from[1], to[0], to[1], roadWidth, "#d8d1bc");
 	});
-	drawEdgeCorners(edges, roadWidth, '#d8d1bc', tempCtx);
+	roadRadius > 2 && drawEdgeCorners(edges, roadWidth, roadRadius, "#d8d1bc", tempCtx);
 
 	accessRoads.forEach(({ from, to }, i) => {
-		drawEdge(tempCtx, from[0], from[1], to[0], to[1], roadWidth /2, '#d8d1bc');
+		drawEdge(tempCtx, from[0], from[1], to[0], to[1], roadWidth / 2, "#d8d1bc");
 	});
 
-	function drawEdge (canvas, x0, y0, x1, y1, width, color) {
+	function drawEdge(canvas, x0, y0, x1, y1, width, color) {
 		canvas.beginPath();
 		canvas.moveTo(x0, y0);
 		canvas.lineTo(x1, y1);
 		canvas.strokeStyle = color;
-		canvas.lineCap = 'round';
-		canvas.lineJoin = 'round';
+		canvas.lineCap = "round";
+		canvas.lineJoin = "round";
 		canvas.lineWidth = width;
 		canvas.stroke();
 	}
 
 	ctx.drawImage(tempCanvas, 0, 0);
 }
+export function drawEdgeCorners(edges, roadWidth, roadRadius, edgeColor, ctx) {
+	let debugIndex = 1;
 
-function drawEdgeCorners(edges, roadWidth, edgeColor, ctx) {
+	// Track processed wedge pairs to prevent duplicates
+	const seenPairs = new Set();
 
 	const points = Array.from(new Set(edges.flatMap((e) => [JSON.stringify(e.from), JSON.stringify(e.to)]))).map(
 		(str) => JSON.parse(str)
@@ -358,19 +359,29 @@ function drawEdgeCorners(edges, roadWidth, edgeColor, ctx) {
 
 		if (connectedEdges.length < 2) return;
 
-		// sort edges by angle for clockwise order
+		// Get angles of connected edges
 		const angles = connectedEdges.map((e) => {
 			const other = e.from[0] === point[0] && e.from[1] === point[1] ? e.to : e.from;
 			const angle = Math.atan2(other[1] - point[1], other[0] - point[0]);
 			return { edge: e, other, angle };
 		});
+
+		// Sort clockwise
 		angles.sort((a, b) => a.angle - b.angle);
 
 		for (let i = 0; i < angles.length; i++) {
 			const curr = angles[i].other;
 			const next = angles[(i + 1) % angles.length].other;
 
-			// skip if these two points are directly connected by an edge
+			// Create a unique key for "unordered pair at this point"
+			const key = `${point[0]},${point[1]}|${curr[0]},${curr[1]}-${next[0]},${next[1]}`;
+			const rkey = `${point[0]},${point[1]}|${next[0]},${next[1]}-${curr[0]},${curr[1]}`;
+
+			// Skip if this wedge was already processed
+			if (seenPairs.has(key) || seenPairs.has(rkey)) continue;
+			seenPairs.add(key);
+
+			// Skip if edges are directly connected
 			const isDirect = edges.some(
 				(e) =>
 					(e.from[0] === curr[0] && e.from[1] === curr[1] && e.to[0] === next[0] && e.to[1] === next[1]) ||
@@ -378,48 +389,81 @@ function drawEdgeCorners(edges, roadWidth, edgeColor, ctx) {
 			);
 			if (isDirect) continue;
 
+			// Compute angles
 			const angle1 = Math.atan2(curr[1] - point[1], curr[0] - point[0]);
 			const angle2 = Math.atan2(next[1] - point[1], next[0] - point[0]);
 
-			let bisectAngle = (angle1 + angle2) / 2;
-			// Handle angle wrap-around
-			if (Math.abs(angle1 - angle2) > Math.PI) {
-				bisectAngle += Math.PI;
-			}
 			let angleDiff = Math.abs(angle2 - angle1);
-			if (Math.abs(angleDiff - Math.PI) < 0.5) continue; // skip near 180deg angles
 			if (angleDiff > Math.PI) angleDiff = 2 * Math.PI - angleDiff;
 
-			const scale = 1 / Math.sin(angleDiff / 2);
-			const scaleCircles = 1 / Math.sin(angleDiff / 1.55);
-			const dist = roadWidth * 0.7 * scale;
-			const distCircles = roadWidth * 0.7 * scaleCircles;
-			const removeRadius = (roadWidth * 0.8) / scaleCircles;
+			const halfAngle = angleDiff / 2;
 
-			const mid = [point[0] + Math.cos(bisectAngle) * dist, point[1] + Math.sin(bisectAngle) * dist];
-			const circlePoint = [
-				point[0] + Math.cos(bisectAngle) * distCircles * 2,
-				point[1] + Math.sin(bisectAngle) * distCircles * 2,
-			];
+			// Check for tiny/straight angles or inner edges
+			const hasInnerEdge = connectedEdges.some((e) => {
+				const other = e.from[0] === point[0] && e.from[1] === point[1] ? e.to : e.from;
+				if (other === curr || other === next) return false;
+				const a = Math.atan2(other[1] - point[1], other[0] - point[0]);
+				const minA = Math.min(angle1, angle2);
+				const maxA = Math.max(angle1, angle2);
+				return a > minA && a < maxA;
+			});
 
-			ctx.beginPath();
-			ctx.globalCompositeOperation = 'sourceOver';
-			ctx.strokeStyle = edgeColor;
-			ctx.stroke;
-			ctx.moveTo(point[0], point[1]);
-			ctx.lineTo(mid[0], mid[1]);
-			ctx.lineCap = 'butt';
-			ctx.lineWidth = roadWidth;
-			ctx.stroke();
+			if (angleDiff < 1e-3 || Math.abs(angleDiff - Math.PI) < 1e-3) {
+				//console.log("Skipping point due to tiny/straight angle", point);
+				continue;
+			}
 
+			if (hasInnerEdge) {
+				//console.log("Skipping point due to inner edge at center", point);
+				continue;
+			}
+
+			if (hasInnerEdge) continue; // skip this wedge
+
+			//smaller radius and smaller distance if angle is too narrow
+			const radius = angleDiff < Math.PI / 4 ? Math.sqrt(roadRadius) / 2 : roadRadius;
+
+			const d_tangent = radius / Math.sin(halfAngle);
+
+			const d_road = roadWidth / 2 / Math.sin(halfAngle);
+
+			const d = d_tangent + d_road; //distance from angle corner point
+
+			let bisector = (angle1 + angle2) / 2;
+			if (Math.abs(angle1 - angle2) > Math.PI) bisector += Math.PI;
+
+			const cx = point[0] + d * Math.cos(bisector);
+			const cy = point[1] + d * Math.sin(bisector);
+			const dist = Math.hypot(cx - point[0], cy - point[1]);
+
+			const t1 = [point[0] + d * Math.cos(bisector - halfAngle), point[1] + d * Math.sin(bisector - halfAngle)];
+
+			const t2 = [point[0] + d * Math.cos(bisector + halfAngle), point[1] + d * Math.sin(bisector + halfAngle)];
+
+			//draw triangle from angle corner point to tangent points
 			ctx.save();
-			ctx.globalCompositeOperation = 'destination-out';
 			ctx.beginPath();
-			ctx.arc(circlePoint[0], circlePoint[1], removeRadius, 0, Math.PI * 2);
-			ctx.fillStyle = '#ff000040';
+			ctx.globalCompositeOperation = "sourceOver";
+			ctx.moveTo(point[0], point[1]);
+			ctx.lineTo(t1[0], t1[1]);
+			ctx.lineTo(t2[0], t2[1]);
+			ctx.closePath();
+			ctx.fillStyle = edgeColor;
+			ctx.lineWidth = 1.5;
+			ctx.fill();
+			ctx.restore();
+
+			//draw circle to erase corner
+			ctx.save();
+			ctx.globalCompositeOperation = "destination-out";
+			ctx.beginPath();
+			ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+			ctx.fillStyle = "#fff";
 			ctx.fill();
 			ctx.restore();
 			ctx.save();
+
+			debugIndex++;
 		}
 	});
 }
@@ -440,8 +484,8 @@ export function drawShadows(
 	{ spriteScale, numSprites, spriteWidth, spriteHeight, spritesPerRow, houseSheet },
 	sunPosition
 ) {
-	const canvas = document.getElementById('houses');
-	const ctx = canvas.getContext('2d');
+	const canvas = document.getElementById("houses");
+	const ctx = canvas.getContext("2d");
 
 	const rectW = spriteWidth * spriteScale;
 	const rectH = spriteHeight * spriteScale;
@@ -473,7 +517,7 @@ export function drawShadows(
 	const polygon = [...corners, ...shadowPoints.slice().reverse()];
 
 	ctx.save();
-	ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+	ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
 	ctx.beginPath();
 	polygon.forEach(({ x: px, y: py }, i) => {
 		if (i === 0) ctx.moveTo(px, py);
@@ -488,8 +532,8 @@ export function drawHouses(
 	{ x, y, angle, spriteIndex },
 	{ spriteScale, spriteWidth, spriteHeight, spritesPerRow, houseSheet }
 ) {
-	const canvas = document.getElementById('houses');
-	const ctx = canvas.getContext('2d');
+	const canvas = document.getElementById("houses");
+	const ctx = canvas.getContext("2d");
 
 	const rectW = spriteWidth * spriteScale;
 	const rectH = spriteHeight * spriteScale;

@@ -1,4 +1,4 @@
-import { Delaunay } from 'https://cdn.jsdelivr.net/npm/d3-delaunay@6/+esm';
+import { Delaunay } from "https://cdn.jsdelivr.net/npm/d3-delaunay@6/+esm";
 
 import {
 	getEdges,
@@ -8,7 +8,7 @@ import {
 	drawEdges,
 	drawHouses,
 	drawShadows,
-} from './drawingHelpers';
+} from "./drawingHelpers";
 
 function drawVoronoi(
 	mode,
@@ -16,6 +16,7 @@ function drawVoronoi(
 		canvasSize,
 		roadStep,
 		roadWidth,
+		roadRadius,
 		points,
 		spriteScale,
 		numSprites,
@@ -25,8 +26,8 @@ function drawVoronoi(
 		houseSheet,
 	}
 ) {
-	const canvasHouses = document.getElementById('houses');
-	const ctxh = canvasHouses.getContext('2d');
+	const canvasHouses = document.getElementById("houses");
+	const ctxh = canvasHouses.getContext("2d");
 
 	if (!points || points.length === 0) return null;
 
@@ -41,10 +42,9 @@ function drawVoronoi(
 
 	const edges = getEdges(voronoiPoints, voronoi, canvasSize);
 	const housePoints = getHousePoints(edges, canvasSize, spriteScale, spriteHeight, numSprites);
-
 	const accessRoads = getAccessRoads(edges, housePoints);
 	//const simplifiedEdges = mergeColinearEdges(edgesWithAccessRoads);
-	drawEdges(edges, accessRoads, roadWidth, canvasSize);
+	drawEdges(edges, accessRoads, roadWidth, roadRadius, canvasSize);
 
 	//drawEdgeCorners(edgesWithAccessRoads, roadWidth);
 
@@ -59,6 +59,7 @@ function drawVoronoi(
 		houseSheet,
 	};
 	ctxh.clearRect(0, 0, canvasSize, canvasSize);
+	
 	housePoints.forEach((p, i) => {
 		drawShadows(p, spriteSettings, sunPosition);
 		drawHouses(p, spriteSettings);
