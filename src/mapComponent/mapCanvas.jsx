@@ -25,8 +25,9 @@ function RenderMapCreator() {
 
 		const houseSheet = new Image();
 		houseSheet.src = 'assets/images/roofs/spritesheet3.png';
-		houseSheet.onload = () => {
-			drawVoronoi('all', {
+		houseSheet.onload = async () => {
+			try {
+				drawVoronoi('all', {
 				canvasSize,
 				roadStep,
 				roadWidth,
@@ -39,6 +40,12 @@ function RenderMapCreator() {
 				spritesPerRow,
 				houseSheet,
 			});
+				
+			} catch (error) {
+				console.error(error);
+				setError(error);
+			}
+			
 		};
 		houseSheet.onerror = () => {
 			console.error('Image failed to load');
@@ -49,8 +56,9 @@ function RenderMapCreator() {
 	useEffect(() => {
 		const houseSheet = new Image();
 		houseSheet.src = 'assets/images/roofs/spritesheet.png';
-		houseSheet.onload = () => {
-			drawVoronoi('houses', {
+		houseSheet.onload = async () => {
+			try {
+				drawVoronoi('houses', {
 				canvasSize,
 				roadStep,
 				roadWidth,
@@ -63,6 +71,11 @@ function RenderMapCreator() {
 				spritesPerRow,
 				houseSheet,
 			});
+			} catch (error) {
+				console.error(error);
+				setError(error);
+			}
+			
 		};
 		houseSheet.onerror = () => {
 			console.error('Image failed to load');
