@@ -21,9 +21,12 @@ export const MapProvider = ({ children }) => {
 		roadRadius: 10,
 		spriteScale: 0.5,
 		numSprites: 8,
+		shadowAngle:2,
+		shadowLength:1,
 	});
 
-	const { canvasSize, roadStep, roadRadius, noiseScale, roadThreshold } = mapSettings;
+	//settings that warrant a recalculation of the road structure
+	const { canvasSize, roadStep, noiseScale, roadThreshold } = mapSettings;
 
 	const [points, setPoints] = useState([]);
 
@@ -37,6 +40,8 @@ export const MapProvider = ({ children }) => {
 			roadWidth: parseInt(localStorage.getItem('roadWidth')) || prev.roadWidth,
 			roadRadius: parseInt(localStorage.getItem('roadWidth')) || prev.roadRadius,
 			spriteScale: parseFloat(localStorage.getItem('houseSize')) || prev.spriteScale,
+			shadowAngle: parseFloat(localStorage.getItem('shadowAngle')) || prev.shadowAngle,
+			shadowLength: parseFloat(localStorage.getItem('shadowLength')) || prev.shadowLength,
 			numSprites: prev.numSprites,
 		}));
 
@@ -67,6 +72,8 @@ export const MapProvider = ({ children }) => {
 		localStorage.setItem('roadWidth', mapSettings.roadWidth);
 		localStorage.setItem('roadRadius', mapSettings.roadRadius);
 		localStorage.setItem('houseSize', mapSettings.spriteScale);
+		localStorage.setItem('shadowAngle', mapSettings.shadowAngle);
+		localStorage.setItem('shadowLength', mapSettings.shadowLength);
 	}, [mapSettings, settingsLoaded]);
 
 	return (
@@ -75,7 +82,7 @@ export const MapProvider = ({ children }) => {
 				error,
 				setError,
 
-				...mapSettings,
+				mapSettings,
 				setSettings,
 
 				points,

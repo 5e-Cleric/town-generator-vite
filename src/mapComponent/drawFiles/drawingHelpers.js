@@ -479,18 +479,46 @@ function ensureClockwise(points) {
 	return points;
 }
 
-export function drawShadows(
-	{ x, y, angle },
-	{ spriteScale, numSprites, spriteWidth, spriteHeight, spritesPerRow, houseSheet },
-	sunPosition
-) {
+// Helper function: Convex Hull using Graham Scan
+function convexHull(points) {
+	if (points.length <= 3) return points.slice();
+
+	// Sort points by x, then y
+	points = points.slice().sort((a, b) => (a.x === b.x ? a.y - b.y : a.x - b.x));
+
+	const cross = (o, a, b) => (a.x - o.x) * (b.y - o.y) - (a.y - o.y) * (b.x - o.x);
+
+	const lower = [];
+	for (const p of points) {
+		while (lower.length >= 2 && cross(lower[lower.length - 2], lower[lower.length - 1], p) <= 0) {
+			lower.pop();
+		}
+		lower.push(p);
+	}
+
+	const upper = [];
+	for (let i = points.length - 1; i >= 0; i--) {
+		const p = points[i];
+		while (upper.length >= 2 && cross(upper[upper.length - 2], upper[upper.length - 1], p) <= 0) {
+			upper.pop();
+		}
+		upper.push(p);
+	}
+
+	lower.pop();
+	upper.pop();
+	return lower.concat(upper);
+}
+
+export function drawShadows({ x, y, angle }, { spriteScale, spriteWidth, spriteHeight },shadowAngle, shadowLength) {
 	const canvas = document.getElementById("houses");
 	const ctx = canvas.getContext("2d");
 
 	const rectW = spriteWidth * spriteScale;
 	const rectH = spriteHeight * spriteScale;
 
-	let corners = [
+	// House corners rotated around its center
+	const corners = [
 		{ x: -rectW / 2, y: -rectH / 2 },
 		{ x: rectW / 2, y: -rectH / 2 },
 		{ x: rectW / 2, y: rectH / 2 },
@@ -501,25 +529,28 @@ export function drawShadows(
 		return { x: x + rx, y: y + ry };
 	});
 
-	corners = ensureClockwise(corners);
-
-	const shadowLength = spriteScale * 10;
+	// Shadow offset
+	const length = spriteScale * 10 * shadowLength;
 	const sunVec = {
-		x: Math.cos(sunPosition),
-		y: Math.sin(sunPosition),
+		x: Math.cos(shadowAngle),
+		y: Math.sin(shadowAngle),
 	};
 
+	// Projected shadow points
 	const shadowPoints = corners.map(({ x: cx, y: cy }) => ({
-		x: cx + sunVec.x * shadowLength,
-		y: cy + sunVec.y * shadowLength,
+		x: cx + sunVec.x * length,
+		y: cy + sunVec.y * length,
 	}));
 
-	const polygon = [...corners, ...shadowPoints.slice().reverse()];
+	// Combine house corners + shadow points and compute convex hull
+	const allPoints = [...corners, ...shadowPoints];
+	const hullPoints = convexHull(allPoints);
 
+	// Draw shadow polygon
 	ctx.save();
 	ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
 	ctx.beginPath();
-	polygon.forEach(({ x: px, y: py }, i) => {
+	hullPoints.forEach(({ x: px, y: py }, i) => {
 		if (i === 0) ctx.moveTo(px, py);
 		else ctx.lineTo(px, py);
 	});
@@ -530,7 +561,8 @@ export function drawShadows(
 
 export function drawHouses(
 	{ x, y, angle, spriteIndex },
-	{ spriteScale, spriteWidth, spriteHeight, spritesPerRow, houseSheet }
+	{ spriteScale, spriteWidth, spriteHeight, spritesPerRow },
+	houseSheet
 ) {
 	const canvas = document.getElementById("houses");
 	const ctx = canvas.getContext("2d");
