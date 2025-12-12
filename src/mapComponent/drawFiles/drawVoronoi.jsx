@@ -7,13 +7,14 @@ import {
 	drawBackground,
 	drawEdges,
 	drawHouses,
-	drawShadows,
+	drawSimpleShadows,
+	drawBlurredShadows
 } from "./drawingHelpers";
 
 function drawVoronoi(mode, { points, mapSettings, spriteSettings, houseSheet }) {
-	const { canvasSize, roadStep, roadWidth, roadRadius, numSprites, spriteScale, shadowAngle, shadowLength } =
+	const { canvasSize, roadStep, roadWidth, roadRadius, numSprites, spriteScale, shadowType, shadowAngle, shadowLength } =
 		mapSettings;
-	const { spriteWidth, spriteHeight, spritesPerRow } = spriteSettings;
+	const { spriteHeight } = spriteSettings;
 
 	const canvasHouses = document.getElementById("houses");
 	const ctxh = canvasHouses.getContext("2d");
@@ -39,7 +40,12 @@ function drawVoronoi(mode, { points, mapSettings, spriteSettings, houseSheet }) 
 
 	ctxh.clearRect(0, 0, canvasSize, canvasSize);
 	housePoints.forEach((p, i) => {
-		if (shadowLength > 0) drawShadows(p, spriteSettings, shadowAngle, shadowLength);
+		if (shadowType !== 'noShadow' && shadowLength > 0) {
+			if (shadowType === 'simpleShadow') drawSimpleShadows(p, spriteSettings, shadowAngle, shadowLength);
+			if (shadowType === 'blurredShadow') drawBlurredShadows(p, spriteSettings, shadowAngle, shadowLength);
+		}
+
+		
 		drawHouses(p, spriteSettings, houseSheet);
 	});
 

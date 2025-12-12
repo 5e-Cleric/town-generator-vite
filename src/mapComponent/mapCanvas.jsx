@@ -16,7 +16,7 @@ function RenderMapCreator() {
 		spritesPerRow,
 	} = useContext(MapContext);
 
-	const { canvasSize, roadStep, roadWidth, roadRadius, numSprites, spriteScale, shadowAngle, shadowLength } =
+	const { canvasSize, roadStep, roadWidth, roadRadius, numSprites, spriteScale, shadowType, shadowAngle, shadowLength } =
 		mapSettings;
 
 	const spriteSettings = {
@@ -74,7 +74,7 @@ function RenderMapCreator() {
 		houseSheet.onerror = () => {
 			console.error("Image failed to load");
 		};
-	}, [spriteScale, shadowAngle, shadowLength]);
+	}, [spriteScale, shadowType, shadowAngle, shadowLength]);
 
 	function fillGrid() {
 		const xLabels = document.querySelector(".grid .xLabels");

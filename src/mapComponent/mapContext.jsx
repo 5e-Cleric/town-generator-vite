@@ -21,6 +21,7 @@ export const MapProvider = ({ children }) => {
 		roadRadius: 10,
 		spriteScale: 0.5,
 		numSprites: 8,
+		shadowType: "simpleShadows",
 		shadowAngle:2,
 		shadowLength:1,
 	});
@@ -40,6 +41,7 @@ export const MapProvider = ({ children }) => {
 			roadWidth: parseInt(localStorage.getItem('roadWidth')) || prev.roadWidth,
 			roadRadius: parseInt(localStorage.getItem('roadWidth')) || prev.roadRadius,
 			spriteScale: parseFloat(localStorage.getItem('houseSize')) || prev.spriteScale,
+			shadowType: localStorage.getItem('shadowType') || prev.shadowType,
 			shadowAngle: parseFloat(localStorage.getItem('shadowAngle')) || prev.shadowAngle,
 			shadowLength: parseFloat(localStorage.getItem('shadowLength')) || prev.shadowLength,
 			numSprites: prev.numSprites,
@@ -72,6 +74,7 @@ export const MapProvider = ({ children }) => {
 		localStorage.setItem('roadWidth', mapSettings.roadWidth);
 		localStorage.setItem('roadRadius', mapSettings.roadRadius);
 		localStorage.setItem('houseSize', mapSettings.spriteScale);
+		localStorage.setItem('shadowType', mapSettings.shadowType);
 		localStorage.setItem('shadowAngle', mapSettings.shadowAngle);
 		localStorage.setItem('shadowLength', mapSettings.shadowLength);
 	}, [mapSettings, settingsLoaded]);

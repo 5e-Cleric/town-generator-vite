@@ -510,7 +510,12 @@ function convexHull(points) {
 	return lower.concat(upper);
 }
 
-export function drawShadows({ x, y, angle }, { spriteScale, spriteWidth, spriteHeight },shadowAngle, shadowLength) {
+export function drawSimpleShadows(
+	{ x, y, angle },
+	{ spriteScale, spriteWidth, spriteHeight },
+	shadowAngle,
+	shadowLength
+) {
 	const canvas = document.getElementById("houses");
 	const ctx = canvas.getContext("2d");
 
@@ -580,4 +585,129 @@ export function drawHouses(
 	ctx.imageSmoothingEnabled = true;
 	ctx.drawImage(houseSheet, sx, sy, spriteWidth, spriteHeight, rectX, rectY, rectW, rectH);
 	ctx.restore();
+}
+
+export function drawBlurredShadows(
+	{ x, y, angle },
+	{ spriteScale, spriteWidth, spriteHeight },
+	shadowAngle,
+	shadowLength
+) {
+	const canvas = document.getElementById("houses");
+	const ctx = canvas.getContext("2d");
+
+	const rectW = spriteWidth * spriteScale;
+	const rectH = spriteHeight * spriteScale;
+
+	// --- 1. ROTATE HOUSE CORNERS ---
+	const corners = [
+		{ x: -rectW / 2, y: -rectH / 2 },
+		{ x: rectW / 2, y: -rectH / 2 },
+		{ x: rectW / 2, y: rectH / 2 },
+		{ x: -rectW / 2, y: rectH / 2 },
+	].map(({ x: cx, y: cy }) => {
+		const rx = cx * Math.cos(angle) - cy * Math.sin(angle);
+		const ry = cx * Math.sin(angle) + cy * Math.cos(angle);
+		return { x: x + rx, y: y + ry };
+	});
+
+	// --- 2. SHADOW OFFSET ---
+	const length = spriteScale * 10 * shadowLength;
+	const sunVec = {
+		x: Math.cos(shadowAngle),
+		y: Math.sin(shadowAngle),
+	};
+
+	const shadowPoints = corners.map(({ x: cx, y: cy }) => ({
+		x: cx + sunVec.x * length,
+		y: cy + sunVec.y * length,
+	}));
+
+	// --- 3. COMBINE + CONVEX HULL ---
+	const allPoints = [...corners, ...shadowPoints];
+	const hullPoints = convexHull(allPoints);
+
+	// --- 4. DRAW SHADOW USING SLICED BLUR ---
+	drawBlurredSlices(ctx, hullPoints, shadowAngle, shadowLength);
+}
+
+function drawBlurredSlices(ctx, polygon, shadowAngle, shadowLength) {
+	function clipPolygonBetween(polygon, lower, upper) {
+		function intersection(a, b, nx, ny, d) {
+			const dx = b.x - a.x;
+			const dy = b.y - a.y;
+			const t = (d - (nx * a.x + ny * a.y)) / (nx * dx + ny * dy);
+			return { x: a.x + t * dx, y: a.y + t * dy };
+		}
+
+		function clipPolygon(polygon, nx, ny, d, keepAbove) {
+			const output = [];
+
+			for (let i = 0; i < polygon.length; i++) {
+				const a = polygon[i];
+				const b = polygon[(i + 1) % polygon.length];
+
+				const da = nx * a.x + ny * a.y - d;
+				const db = nx * b.x + ny * b.y - d;
+
+				const aInside = keepAbove ? da >= 0 : da <= 0;
+				const bInside = keepAbove ? db >= 0 : db <= 0;
+
+				if (aInside && bInside) {
+					output.push(b);
+				} else if (aInside && !bInside) {
+					output.push(intersection(a, b, nx, ny, d));
+				} else if (!aInside && bInside) {
+					output.push(intersection(a, b, nx, ny, d));
+					output.push(b);
+				}
+			}
+
+			return output;
+		}
+
+		let poly = clipPolygon(polygon, lower.nx, lower.ny, lower.d, true);
+		if (!poly || poly.length === 0) return null;
+
+		poly = clipPolygon(poly, upper.nx, upper.ny, upper.d, false);
+		return poly && poly.length > 0 ? poly : null;
+	}
+
+	const sliceWidth = 4; // 1px thick slices
+	const minBlur = 0.1; // starting blur
+	const maxBlur = shadowLength * 0.9; // ending blur
+
+	// Normal vector perpendicular to shadow direction
+	const nx = Math.cos(shadowAngle - 0.8 + Math.PI / 2);
+	const ny = Math.sin(shadowAngle - 0.8 + Math.PI / 2);
+
+	// Projection range
+	const projections = polygon.map((p) => p.x * nx + p.y * ny);
+	const minProj = Math.min(...projections);
+	const maxProj = Math.max(...projections);
+	const totalSlices = Math.ceil(maxProj - minProj);
+
+	for (let t = minProj; t < maxProj; t += sliceWidth) {
+		const slicePoly = clipPolygonBetween(polygon, { nx, ny, d: t }, { nx, ny, d: t + sliceWidth });
+
+		if (!slicePoly || slicePoly.length < 3) continue;
+
+		const i = Math.floor(t - minProj);
+		const k = i / totalSlices; // 0 → 1 progress
+		const blur = minBlur + k * (maxBlur - minBlur);
+
+		ctx.save();
+		ctx.filter = `blur(${blur}px)`;
+		ctx.fillStyle = "rgba(0,0,0,0.22)";
+
+		ctx.beginPath();
+		slicePoly.forEach((p, idx) => {
+			if (idx === 0) ctx.moveTo(p.x, p.y);
+			else ctx.lineTo(p.x, p.y);
+		});
+		ctx.closePath();
+		ctx.fill();
+
+		ctx.restore();
+	}
 }

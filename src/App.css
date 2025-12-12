@@ -5,7 +5,7 @@
 
 body {
 	margin: 0;
-	background: #2C3E50;
+	background: #2c3e50;
 	color: white;
 	font-family: monospace;
 	height: 100vh;
@@ -13,7 +13,6 @@ body {
 	#root {
 		height: 100%;
 		width: 100%;
-		;
 	}
 
 	main {
@@ -40,18 +39,85 @@ body {
 			}
 			*/
 
-			form label {
-				font-weight: 800;
-				display: block;
+			form {
+				details,
+				fieldset {
+					border: unset;
+					background-color: #333;
+					border-radius:3px;
+					margin-bottom: 10px;
 
-				input, select {
-					margin-left: 10px;
-					color: black;
+					summary,
+					h3 {
+						font-size: 17px;
+						padding-left: 5px;
+					}
+
+					> :not(h3, summary):not(:last-child) {
+						border-bottom: 1px solid #444;
+					}
 				}
 
-				border-bottom:1px solid #444;
-				padding:10px;
-				width:100%;
+				.radioGroup {
+					display: flex;
+					flex-direction: column;
+					padding-left: 20px;
+					label {
+						font-weight: 800;
+						display: flex;
+						align-items: center;
+						gap: 10px;
+					}
+				}
+
+				> label,
+				> :is(fieldset, details) > label {
+					font-weight: 800;
+					display: block;
+
+					input,
+					select {
+						margin-left: 10px;
+						color: black;
+					}
+
+					input[type="range"] {
+						position: relative;
+
+						&::before {
+							content: attr(value);
+							position: absolute;
+							right: -10px;
+							top: 50%;
+							translate: 100% -50%;
+							width: 5ch;
+							height: 1em;
+							color: white;
+							border: 1px solid #444;
+							border-radius: 5px;
+							text-align: right;
+							padding: 2px 5px;
+						}
+
+						&[displayedValue]::before {
+							content: attr(displayedvalue);
+						}
+						&::after {
+							content: attr(unit);
+							position: absolute;
+							right: -15px;
+							top: 50%;
+							translate: calc(100% + 5ch) -50%;
+							width: fit-content;
+							height: 1em;
+							color: #ccc;
+							padding: 2px 5px;
+						}
+					}
+
+					padding: 10px;
+					width: 100%;
+				}
 			}
 
 			ul.dropdownList {
@@ -63,7 +129,6 @@ body {
 				margin: 0;
 				gap: 1px;
 				width: 250px;
-
 
 				li {
 					flex: 1;
@@ -79,20 +144,16 @@ body {
 						width: 100%;
 
 						.trigger {
-
 							h3 {
-
 								padding-left: 10px;
 								margin: 0;
 							}
-
 						}
 
 						.box {
 							height: 200px;
 							display: flex;
 							flex-wrap: wrap;
-
 
 							.asset {
 								outline: 1px solid #555;
@@ -116,21 +177,17 @@ body {
 								padding: 5px;
 							}
 
-							overflow-y:scroll;
+							overflow-y: scroll;
 						}
 
 						&.active {
-
 							.trigger {
 								border-bottom: 1px solid #777;
 							}
-
 						}
-
 					}
 				}
 			}
-
 		}
 
 		.canvasHolder {
@@ -141,10 +198,10 @@ body {
 			margin-bottom: 70px;
 
 			&::after {
-				content:'';
-				background:radial-gradient(circle at 50%, transparent , #00000000 300px, #0000003f 500px);
-				position:absolute;
-				inset:0;
+				content: "";
+				background: radial-gradient(circle at 50%, transparent, #00000000 300px, #0000003f 500px);
+				position: absolute;
+				inset: 0;
 			}
 
 			/* #################   Grid Settings   ###############*/
@@ -155,7 +212,7 @@ body {
 				position: absolute;
 				top: -20px;
 				left: -20px;
-				width: calc(100% + var(--labelWidth) *2);
+				width: calc(100% + var(--labelWidth) * 2);
 				color: white;
 				font-size: 12px;
 				font-family: monospace;
@@ -176,7 +233,8 @@ body {
 					top: 15px;
 				}
 
-				.labelX, .labelY {
+				.labelX,
+				.labelY {
 					position: absolute;
 				}
 
@@ -198,14 +256,12 @@ body {
 				top: 0;
 				display: block;
 				margin: 0 auto;
-				height:100%;
-				width:100%;
+				height: 100%;
+				width: 100%;
 
 				&:first-of-type {
 					box-shadow: 1px 4px 14px #000000;
-					
 				}
-
 			}
 		}
 	}
@@ -215,12 +271,29 @@ body {
 		position: absolute;
 		z-index: 100;
 		inset: 0;
-		background: repeating-linear-gradient(90deg, currentColor 0px, currentColor 1px, transparent 0px, transparent 39px, currentColor 39px, currentColor 40px),
-			repeating-linear-gradient(0deg, currentColor 0px, currentColor 1px, transparent 0px, transparent 39px, currentColor 39px, currentColor 40px);
+		background: repeating-linear-gradient(
+				90deg,
+				currentColor 0px,
+				currentColor 1px,
+				transparent 0px,
+				transparent 39px,
+				currentColor 39px,
+				currentColor 40px
+			),
+			repeating-linear-gradient(
+				0deg,
+				currentColor 0px,
+				currentColor 1px,
+				transparent 0px,
+				transparent 39px,
+				currentColor 39px,
+				currentColor 40px
+			);
 	}
 }
 
-input, select {
+input,
+select {
 	border-radius: 5px;
 	background: #fff9ec;
 	height: 2em;
