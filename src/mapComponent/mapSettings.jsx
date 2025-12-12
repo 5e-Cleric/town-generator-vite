@@ -157,6 +157,7 @@ function RenderMapSettings() {
 							unit="px"
 							onChange={handleChange}
 						/>
+						<small>Note: shadow blurriness depends on the length.</small>
 					</label>
 				</details>
 			</form>

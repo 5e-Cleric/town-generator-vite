@@ -2,7 +2,7 @@
   "name": "town-generator-vite",
   "homepage": "https://5e-cleric.github.io/town-generator-vite/",
   "private": true,
-  "version": "2.0.0",
+  "version": "2.5.0",
   "type": "module",
   "scripts": {
     "dev": "vite",

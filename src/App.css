@@ -73,10 +73,12 @@ body {
 				> label,
 				> :is(fieldset, details) > label {
 					font-weight: 800;
-					display: block;
+					display: flex;
+					flex-direction: column;
 
 					input,
 					select {
+						width:180px;
 						margin-left: 10px;
 						color: black;
 					}
@@ -117,6 +119,10 @@ body {
 
 					padding: 10px;
 					width: 100%;
+				}
+
+				small {
+					color:#999;
 				}
 			}
 
