@@ -1,4 +1,4 @@
-function drawNoise({ canvasSize, roadStep, roadWidth, points, spriteScale, numSprites }) {
+function drawNoise({ canvasSize, roadStep, points}) {
 	const canvas = document.getElementById('town');
 	const ctx = canvas.getContext('2d');
 

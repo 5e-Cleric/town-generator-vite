@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import react from 'react';
 import './App.css';
 import RenderMapAssets from './mapComponent/mapAssets';
 import RenderMapCreator from './mapComponent/mapCanvas';
