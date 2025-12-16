@@ -13,19 +13,51 @@ body {
 	#root {
 		height: 100%;
 		width: 100%;
+		display: grid;
+		grid-template-rows: 50px 1fr;
+	}
+
+	header {
+		height: 100%;
+		background: #333;
+		padding-inline: 10px;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+
+		.logo {
+			font-size: 2em;
+			color: var(--p-clr);
+			text-decoration: none;
+
+			svg {
+				height: 0.9em;
+				margin-right: 0.2em;
+				fill: currentColor;
+			}
+
+			.name {
+				font-family: "CodeLight";
+
+				.crit {
+					font-family: "CodeBold";
+				}
+			}
+		}
 	}
 
 	main {
 		display: flex;
 		align-items: center;
-		height: 100%;
+		overflow: hidden;
 
 		.sidebar {
 			position: relative;
 			background: #222;
-			padding: 50px;
+			padding: 30px;
 			height: 100%;
-			min-width: 350px;
+			width: 400px;
+			overflow-y: auto;
 
 			/*
 			background: url('/images/textures/scroll.png');
@@ -40,11 +72,12 @@ body {
 			*/
 
 			form {
+				width: 320px;
 				details,
 				fieldset {
 					border: unset;
 					background-color: #333;
-					border-radius:3px;
+					border-radius: 3px;
 					margin-bottom: 10px;
 
 					summary,
@@ -78,7 +111,7 @@ body {
 
 					input,
 					select {
-						width:150px;
+						width: 150px;
 						margin-left: 10px;
 						color: black;
 					}
@@ -122,7 +155,7 @@ body {
 				}
 
 				small {
-					color:#999;
+					color: #999;
 				}
 			}
 
@@ -201,7 +234,6 @@ body {
 			width: fit-content;
 			height: fit-content;
 			position: relative;
-			margin-bottom: 70px;
 
 			&::after {
 				content: "";

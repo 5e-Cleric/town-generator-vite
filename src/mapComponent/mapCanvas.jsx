@@ -67,7 +67,6 @@ function RenderMapCreator() {
 	);
 
 	const map = useMemo(() => {
-		console.log("points: ", points.length, "canvas size: ", canvasSize);
 		return makeMap(points, canvasSize, roadStep, numSprites, spriteScale, spriteHeight);
 	}, [points, roadStep, numSprites, spriteScale, spriteHeight]); //points depends on canvasSize
 
