@@ -236,9 +236,7 @@ export function mergeColinearMainRoads(mainRoads) {
 
 // ############################   Drawing   #############################
 
-export function drawBackground(canvas, canvasSize) {
-	const ctx = canvas.getContext("2d");
-
+export function drawBackground(ctx, canvasSize) {
 	const noise2D = createNoise2D();
 	const step = 1;
 	const noiseScale = 0.001;
@@ -301,10 +299,7 @@ export function drawBackground(canvas, canvasSize) {
 	ctx.drawImage(offCanvas, 0, 0, canvasSize, canvasSize);
 }
 
-export function drawMainRoads(canvas, mainRoads, accessRoads, roadWidth, roadRadius, canvasSize) {
-	const ctx = canvas.getContext("2d");
-	ctx.clearRect(0, 0, canvasSize, canvasSize);
-
+export function drawMainRoads(ctx, mainRoads, accessRoads, roadWidth, roadRadius, canvasSize) {
 	mainRoads.forEach(({ from, to }, i) => {
 		drawEdge(ctx, from[0], from[1], to[0], to[1], roadWidth + 4, "#809070");
 	});
@@ -342,6 +337,7 @@ export function drawMainRoads(canvas, mainRoads, accessRoads, roadWidth, roadRad
 
 	ctx.drawImage(tempCanvas, 0, 0);
 }
+
 export function drawEdgeCorners(mainRoads, roadWidth, roadRadius, edgeColor, ctx) {
 	let debugIndex = 1;
 

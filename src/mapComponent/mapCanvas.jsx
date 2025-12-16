@@ -1,9 +1,15 @@
 import { useContext, useEffect, useMemo, useRef } from "react";
 
 import { MapContext } from "./mapContext.jsx";
-import drawNoise from "./drawFiles/drawNoise.jsx";
-import drawVoronoi from "./drawFiles/drawVoronoi.js";
+//import drawNoise from "./drawFiles/drawNoise.jsx";
 import makeMap from "./drawFiles/makeMap.js";
+import {
+	drawBackground,
+	drawMainRoads,
+	drawHouses,
+	drawSimpleShadows,
+	drawBlurredShadows,
+} from "./drawFiles/drawingHelpers";
 
 function RenderMapCreator() {
 	const {
@@ -20,8 +26,13 @@ function RenderMapCreator() {
 	const layers = {
 		background: useRef(null),
 		roads: useRef(null),
+		shadows: useRef(null),
 		houses: useRef(null),
 	};
+	const ctxb = layers.background.current?.getContext("2d");
+	const ctxr = layers.roads.current?.getContext("2d");
+	const ctxs = layers.shadows.current?.getContext("2d");
+	const ctxh = layers.houses.current?.getContext("2d");
 
 	const {
 		canvasSize,
@@ -35,33 +46,63 @@ function RenderMapCreator() {
 		shadowLength,
 	} = mapSettings;
 
-	const spriteSettings = {
-		spriteScale,
-		numSprites,
-		spriteWidth,
-		spriteHeight,
-		spritesPerRow,
-		shadowAngle,
-		shadowLength,
-	};
+	const spriteSettings = useMemo(
+		() => ({
+			spriteScale,
+			numSprites,
+			spriteWidth,
+			spriteHeight,
+			spritesPerRow,
+		}),
+		[spriteScale, numSprites, spriteWidth, spriteHeight, spritesPerRow]
+	);
+
+	const shadowSettings = useMemo(
+		() => ({
+			shadowType,
+			shadowAngle,
+			shadowLength,
+		}),
+		[shadowType, shadowAngle, shadowLength]
+	);
 
 	const map = useMemo(() => {
+		console.log("points: ", points.length, "canvas size: ", canvasSize);
 		return makeMap(points, canvasSize, roadStep, numSprites, spriteScale, spriteHeight);
-	}, [points, canvasSize, roadStep, numSprites, spriteScale, spriteHeight]);
+	}, [points, roadStep, numSprites, spriteScale, spriteHeight]); //points depends on canvasSize
 
 	const mainRoads = map?.mainRoads;
 	const housePoints = map?.housePoints;
 	const accessRoads = map?.accessRoads;
 
 	useEffect(() => {
-		if (!points || points.length === 0 || !map) return;
-		if (!mapSettings) return;
+		if (!canvasSize || !ctxb) return;
+		drawBackground(ctxb, canvasSize);
+	}, [ctxb, canvasSize]);
+
+	useEffect(() => {
+		if (!map || !ctxr || !ctxs || !ctxh) return;
 
 		const houseSheet = new Image();
 		houseSheet.src = "assets/images/roofs/spritesheet3.png";
 		houseSheet.onload = async () => {
 			try {
-				drawVoronoi(layers, { mapSettings, spriteSettings, mainRoads, housePoints, accessRoads, houseSheet });
+				ctxr.clearRect(0, 0, canvasSize, canvasSize);
+				drawMainRoads(ctxr, mainRoads, accessRoads, roadWidth, roadRadius, canvasSize);
+				ctxs.clearRect(0, 0, canvasSize, canvasSize);
+				ctxh.clearRect(0, 0, canvasSize, canvasSize);
+				housePoints.forEach((p, i) => {
+					if (shadowType !== "noShadow" && shadowLength > 0) {
+						if (shadowType === "simpleShadow")
+							drawSimpleShadows(ctxs, p, spriteSettings, shadowAngle, shadowLength);
+						if (shadowType === "blurredShadow")
+							drawBlurredShadows(ctxs, p, spriteSettings, shadowAngle, shadowLength);
+					}
+
+					drawHouses(ctxh, p, spriteSettings, houseSheet);
+				});
+
+				//points.forEach(([x, y]) => {ctxh.fillStyle = 'red';ctxh.fillRect(x, y, roadStep / 10, roadStep / 10);}); //Drawing the points
 			} catch (error) {
 				console.error(error);
 				setError(error);
@@ -71,7 +112,23 @@ function RenderMapCreator() {
 			console.error("Image failed to load");
 		};
 		//fillGrid();
-	}, [mapSettings, spriteSettings, mainRoads, housePoints, accessRoads]);
+	}, [map, roadWidth, roadRadius, numSprites, spriteScale, spriteSettings, ctxh, ctxr, ctxs]);
+
+	useEffect(() => {
+		//redraw shadows
+		if (!points || points.length === 0 || !map) return;
+		if (!mapSettings) return;
+		if (shadowType === "noShadow") return;
+		ctxs.clearRect(0, 0, canvasSize, canvasSize);
+		housePoints.forEach((p, i) => {
+			if (shadowType !== "noShadow" && shadowLength > 0) {
+				if (shadowType === "simpleShadow")
+					drawSimpleShadows(ctxs, p, spriteSettings, shadowAngle, shadowLength);
+				if (shadowType === "blurredShadow")
+					drawBlurredShadows(ctxs, p, spriteSettings, shadowAngle, shadowLength);
+			}
+		});
+	}, [ctxs, shadowSettings]);
 
 	function fillGrid() {
 		const xLabels = document.querySelector(".grid .xLabels");
@@ -128,6 +185,7 @@ function RenderMapCreator() {
 				height={canvasSize}
 				width={canvasSize}
 				style={{ filter: "url(#pencil-filter-)" }}></canvas>
+			<canvas ref={layers.shadows} height={canvasSize} width={canvasSize}></canvas>
 			<canvas ref={layers.houses} height={canvasSize} width={canvasSize}></canvas>
 
 			{

@@ -4,10 +4,15 @@ function makeMap(points, canvasSize, roadStep, numSprites, spriteScale, spriteHe
 	if (!points || points.length === 0) return null;
 	if (points.length > 500) throw new Error("This map is too big, sorry!");
 
-	console.log('running makeMap');
+	console.log("running makeMap");
 
+	const minDistanceFromEdge = roadStep +100;
 	const filteredPoints = points.filter(
-		([x, y]) => x > roadStep && x < canvasSize - roadStep && y > roadStep && y < canvasSize - roadStep
+		([x, y]) =>
+			x > minDistanceFromEdge &&
+			x < canvasSize - minDistanceFromEdge &&
+			y > minDistanceFromEdge &&
+			y < canvasSize - minDistanceFromEdge
 	);
 
 	const mainRoads = getMainRoads(filteredPoints, canvasSize);
