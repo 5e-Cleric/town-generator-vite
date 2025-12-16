@@ -17,21 +17,21 @@ function drawNoise({ canvasSize, roadStep, points}) {
 	}
 
 	console.log(`${roadPoints.length} points`);
-	const edges = joinPoints(roadPoints);
+	const mainRoads = joinPoints(roadPoints);
 
-	const squares = joinEdges(edges);
+	const squares = joinMainRoads(mainRoads);
 
-	const corners = joinCorners(edges);
-	//draw edges
+	const corners = joinCorners(mainRoads);
+	//draw mainRoads
 
 
-	console.log(edges, squares, corners);
+	console.log(mainRoads, squares, corners);
 	const pointSize = roadStep / 4;
 
 	ctx.beginPath();
 	ctx.strokeStyle = 'black';
 	ctx.lineWidth = pointSize * 2;
-	edges.forEach(({ from, to }) => {
+	mainRoads.forEach(({ from, to }) => {
 		ctx.moveTo(from.x + pointSize, from.y + pointSize);
 		ctx.lineTo(to.x + pointSize, to.y + pointSize);
 	});
@@ -61,7 +61,7 @@ function drawNoise({ canvasSize, roadStep, points}) {
 	function joinPoints(points) {
 			console.log(points);
 		let pointsUpdated = [];
-		let edges = [];
+		let mainRoads = [];
 
 		for (let j = 0; j < points.length; j++) {
 			let point = { i: j, x: points[j].x, y: points[j].y, pathTo: [] };
@@ -95,24 +95,24 @@ function drawNoise({ canvasSize, roadStep, points}) {
 			const currentPoint = pointsUpdated[l];
 			if (currentPoint.pathTo.length !== 0) {
 				for (let n = 0; n < currentPoint.pathTo.length; n++) {
-					edges.push({ from: pointsUpdated[l], to: pointsUpdated[pointsUpdated[l].pathTo[n]] });
+					mainRoads.push({ from: pointsUpdated[l], to: pointsUpdated[pointsUpdated[l].pathTo[n]] });
 				}
 			}
 		}
 
 		//console.table(pointsUpdated);;
-		return edges;
+		return mainRoads;
 	}
 
-	function joinEdges(edges) {
+	function joinMainRoads(mainRoads) {
 		let squares = [];
 		let seen = new Set();
 
-		for (let i = 0; i < edges.length; i++) {
-			const edge1 = edges[i];
+		for (let i = 0; i < mainRoads.length; i++) {
+			const edge1 = mainRoads[i];
 
-			for (let j = i + 1; j < edges.length; j++) {
-				const edge2 = edges[j];
+			for (let j = i + 1; j < mainRoads.length; j++) {
+				const edge2 = mainRoads[j];
 
 				if (isSquare(edge1, edge2)) {
 					const xs = [edge1.from.x, edge1.to.x, edge2.from.x, edge2.to.x];
@@ -133,15 +133,15 @@ function drawNoise({ canvasSize, roadStep, points}) {
 		return squares;
 	}
 
-	function joinCorners(edges) {
+	function joinCorners(mainRoads) {
 		let corners = [];
 		let seen = new Set();
 
-		for (let i = 0; i < edges.length; i++) {
-			const edge1 = edges[i];
+		for (let i = 0; i < mainRoads.length; i++) {
+			const edge1 = mainRoads[i];
 
-			for (let j = i + 1; j < edges.length; j++) {
-				const edge2 = edges[j];
+			for (let j = i + 1; j < mainRoads.length; j++) {
+				const edge2 = mainRoads[j];
 
 				if (isCorner(edge1, edge2)) {
 					const points = [edge1.from, edge1.to, edge2.from, edge2.to];
@@ -195,7 +195,7 @@ function drawNoise({ canvasSize, roadStep, points}) {
 
 		if (!(isHorizontal || isVertical)) return false;
 
-		// Check distance between edges
+		// Check distance between mainRoads
 		if (isHorizontal) {
 			const dy = Math.abs(edge1.from.y - edge2.from.y);
 			if (dy !== roadStep) return false;

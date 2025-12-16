@@ -39,7 +39,7 @@ function RenderMapSettings() {
 					</label>
 				</fieldset>
 				<details>
-					<summary>Roads</summary>
+					<summary>Main Roads</summary>
 					<label>
 						<p>Road Density:</p>
 						<input

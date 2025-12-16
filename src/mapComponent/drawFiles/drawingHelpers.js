@@ -1,10 +1,11 @@
 import { createNoise2D } from "simplex-noise";
+import { Delaunay } from "https://cdn.jsdelivr.net/npm/d3-delaunay@6/+esm";
 
 export function pointsEqual(a, b) {
 	return a[0] === b[0] && a[1] === b[1];
 }
 
-export function edgesEqual(e1, e2) {
+export function mainRoadsEqual(e1, e2) {
 	return (
 		(pointsEqual(e1.from, e2.from) && pointsEqual(e1.to, e2.to)) ||
 		(pointsEqual(e1.from, e2.to) && pointsEqual(e1.to, e2.from))
@@ -37,7 +38,7 @@ export function isFullBorderEdge(edge, canvasSize) {
 	return false;
 }
 
-export function edgesTooClose(e1, e2, minDist = 50) {
+export function mainRoadsTooClose(e1, e2, minDist = 50) {
 	const dists = [
 		distSquared(e1.from, e2.from),
 		distSquared(e1.from, e2.to),
@@ -48,31 +49,32 @@ export function edgesTooClose(e1, e2, minDist = 50) {
 	return dists.some((d) => d < minDistSq);
 }
 
-export function filterEdges(edges, canvasSize) {
-	const keptEdges = [];
+export function filterMainRoads(mainRoads, canvasSize) {
+	const keptMainRoads = [];
 
-	for (const edge of edges) {
+	for (const edge of mainRoads) {
 		if (!isBorderEdge(edge, canvasSize)) {
-			keptEdges.push(edge);
+			keptMainRoads.push(edge);
 			continue;
 		}
 		if (isFullBorderEdge(edge, canvasSize)) continue;
 
 		let shouldSkip = false;
-		for (const e of keptEdges) {
-			if (isBorderEdge(e, canvasSize) && (isParallel(e, edge) || edgesTooClose(e, edge))) {
+		for (const e of keptMainRoads) {
+			if (isBorderEdge(e, canvasSize) && (isParallel(e, edge) || mainRoadsTooClose(e, edge))) {
 				shouldSkip = true;
 				break;
 			}
 		}
-		if (!shouldSkip) keptEdges.push(edge);
+		if (!shouldSkip) keptMainRoads.push(edge);
 	}
 
-	return keptEdges;
+	return keptMainRoads;
 }
 
-export function getEdges(points, voronoi, canvasSize) {
-	const unFilteredEdges = [];
+export function getMainRoads(points, canvasSize) {
+	const unFilteredMainRoads = [];
+		const voronoi = Delaunay.from(points).voronoi([0, 0, canvasSize, canvasSize]);
 
 	for (let i = 0; i < points.length; i++) {
 		const poly = voronoi.cellPolygon(i);
@@ -81,36 +83,36 @@ export function getEdges(points, voronoi, canvasSize) {
 		for (let j = 0; j < poly.length - 1; j++) {
 			const from = poly[j];
 			const to = poly[j + 1];
-			if (!!from[0] && !!to[0]) unFilteredEdges.push({ from, to });
+			if (!!from[0] && !!to[0]) unFilteredMainRoads.push({ from, to });
 		}
 	}
 
-	const edges = removeDuplicates(filterEdges(unFilteredEdges, canvasSize));
-	return edges;
+	const mainRoads = removeDuplicates(filterMainRoads(unFilteredMainRoads, canvasSize));
+	return mainRoads;
 }
 
-export function removeDuplicates(edges) {
+export function removeDuplicates(mainRoads) {
 	const unique = [];
-	for (const e of edges) {
-		if (!unique.some((u) => edgesEqual(u, e))) {
+	for (const e of mainRoads) {
+		if (!unique.some((u) => mainRoadsEqual(u, e))) {
 			unique.push(e);
 		}
 	}
 	return unique;
 }
 
-export function getHousePoints(edges, canvasSize, spriteHeight, numSprites) {
+export function getHousePoints(mainRoads, canvasSize, spriteHeight, numSprites) {
 	const density = parseFloat(localStorage.getItem("houseDensity")) || 0.1;
 	const minDist = Math.round(spriteHeight * 50);
 	const offset = Math.round(spriteHeight * 50 + 5);
 	//ideally values around 30
 
 	const housePoints = [];
-	const houseEdges = edges.filter((e) => !isBorderEdge(e, canvasSize));
+	const houseMainRoads = mainRoads.filter((e) => !isBorderEdge(e, canvasSize));
 
 	function isTooCloseToEdge({ x, y }) {
 		const minDistSq = (minDist - 5) ** 2;
-		return edges.some(({ from, to }) => {
+		return mainRoads.some(({ from, to }) => {
 			const dx = to[0] - from[0];
 			const dy = to[1] - from[1];
 			const lenSq = dx * dx + dy * dy;
@@ -121,7 +123,7 @@ export function getHousePoints(edges, canvasSize, spriteHeight, numSprites) {
 		});
 	}
 
-	for (const { from, to } of houseEdges) {
+	for (const { from, to } of houseMainRoads) {
 		const dx = to[0] - from[0];
 		const dy = to[1] - from[1];
 		const length = Math.sqrt(dx * dx + dy * dy);
@@ -159,14 +161,14 @@ export function getHousePoints(edges, canvasSize, spriteHeight, numSprites) {
 	return housePoints;
 }
 
-export function getAccessRoads(edges, housePoints) {
+export function getAccessRoads(mainRoads, housePoints) {
 	const accessRoads = [];
 
 	for (const house of housePoints) {
 		let closestPoint = null;
 		let minDistSq = Infinity;
 
-		for (const { from, to } of edges) {
+		for (const { from, to } of mainRoads) {
 			const dx = to[0] - from[0];
 			const dy = to[1] - from[1];
 			const lenSq = dx * dx + dy * dy;
@@ -189,23 +191,23 @@ export function getAccessRoads(edges, housePoints) {
 	return accessRoads;
 }
 
-export function mergeColinearEdges(edges) {
+export function mergeColinearMainRoads(mainRoads) {
 	const merged = [];
 	const used = new Set();
 
-	for (let i = 0; i < edges.length; i++) {
+	for (let i = 0; i < mainRoads.length; i++) {
 		if (used.has(i)) continue;
 
-		let current = edges[i];
+		let current = mainRoads[i];
 		used.add(i);
 
 		let mergedThisRound;
 		do {
 			mergedThisRound = false;
 
-			for (let j = 0; j < edges.length; j++) {
+			for (let j = 0; j < mainRoads.length; j++) {
 				if (used.has(j)) continue;
-				const candidate = edges[j];
+				const candidate = mainRoads[j];
 				if (!isParallel(current, candidate)) continue;
 
 				let sharedPoint = null;
@@ -300,16 +302,16 @@ export function drawBackground(canvasSize) {
 	ctx.drawImage(offCanvas, 0, 0, canvasSize, canvasSize);
 }
 
-export function drawEdges(edges, accessRoads, roadWidth, roadRadius, canvasSize) {
+export function drawMainRoads(mainRoads, accessRoads, roadWidth, roadRadius, canvasSize) {
 	const canvas = document.getElementById("roads");
 	const ctx = canvas.getContext("2d");
 	ctx.clearRect(0, 0, canvasSize, canvasSize);
 
-	edges.forEach(({ from, to }, i) => {
+	mainRoads.forEach(({ from, to }, i) => {
 		drawEdge(ctx, from[0], from[1], to[0], to[1], roadWidth + 4, "#809070");
 	});
 
-	roadRadius > 2 && drawEdgeCorners(edges, roadWidth + 3, roadRadius, "#809070", ctx);
+	roadRadius > 2 && drawEdgeCorners(mainRoads, roadWidth + 3, roadRadius, "#809070", ctx);
 
 	accessRoads.forEach(({ from, to }, i) => {
 		drawEdge(ctx, from[0], from[1], to[0], to[1], (roadWidth + 4) / 2, "#809070");
@@ -320,10 +322,10 @@ export function drawEdges(edges, accessRoads, roadWidth, roadRadius, canvasSize)
 	tempCanvas.height = canvasSize;
 	const tempCtx = tempCanvas.getContext("2d");
 
-	edges.forEach(({ from, to }) => {
+	mainRoads.forEach(({ from, to }) => {
 		drawEdge(tempCtx, from[0], from[1], to[0], to[1], roadWidth, "#d8d1bc");
 	});
-	roadRadius > 2 && drawEdgeCorners(edges, roadWidth, roadRadius, "#d8d1bc", tempCtx);
+	roadRadius > 2 && drawEdgeCorners(mainRoads, roadWidth, roadRadius, "#d8d1bc", tempCtx);
 
 	accessRoads.forEach(({ from, to }, i) => {
 		drawEdge(tempCtx, from[0], from[1], to[0], to[1], roadWidth / 2, "#d8d1bc");
@@ -342,25 +344,25 @@ export function drawEdges(edges, accessRoads, roadWidth, roadRadius, canvasSize)
 
 	ctx.drawImage(tempCanvas, 0, 0);
 }
-export function drawEdgeCorners(edges, roadWidth, roadRadius, edgeColor, ctx) {
+export function drawEdgeCorners(mainRoads, roadWidth, roadRadius, edgeColor, ctx) {
 	let debugIndex = 1;
 
 	// Track processed wedge pairs to prevent duplicates
 	const seenPairs = new Set();
 
-	const points = Array.from(new Set(edges.flatMap((e) => [JSON.stringify(e.from), JSON.stringify(e.to)]))).map(
+	const points = Array.from(new Set(mainRoads.flatMap((e) => [JSON.stringify(e.from), JSON.stringify(e.to)]))).map(
 		(str) => JSON.parse(str)
 	);
 
 	points.forEach((point) => {
-		const connectedEdges = edges.filter(
+		const connectedMainRoads = mainRoads.filter(
 			(e) => (e.from[0] === point[0] && e.from[1] === point[1]) || (e.to[0] === point[0] && e.to[1] === point[1])
 		);
 
-		if (connectedEdges.length < 2) return;
+		if (connectedMainRoads.length < 2) return;
 
-		// Get angles of connected edges
-		const angles = connectedEdges.map((e) => {
+		// Get angles of connected mainRoads
+		const angles = connectedMainRoads.map((e) => {
 			const other = e.from[0] === point[0] && e.from[1] === point[1] ? e.to : e.from;
 			const angle = Math.atan2(other[1] - point[1], other[0] - point[0]);
 			return { edge: e, other, angle };
@@ -381,8 +383,8 @@ export function drawEdgeCorners(edges, roadWidth, roadRadius, edgeColor, ctx) {
 			if (seenPairs.has(key) || seenPairs.has(rkey)) continue;
 			seenPairs.add(key);
 
-			// Skip if edges are directly connected
-			const isDirect = edges.some(
+			// Skip if mainRoads are directly connected
+			const isDirect = mainRoads.some(
 				(e) =>
 					(e.from[0] === curr[0] && e.from[1] === curr[1] && e.to[0] === next[0] && e.to[1] === next[1]) ||
 					(e.from[0] === next[0] && e.from[1] === next[1] && e.to[0] === curr[0] && e.to[1] === curr[1])
@@ -398,8 +400,8 @@ export function drawEdgeCorners(edges, roadWidth, roadRadius, edgeColor, ctx) {
 
 			const halfAngle = angleDiff / 2;
 
-			// Check for tiny/straight angles or inner edges
-			const hasInnerEdge = connectedEdges.some((e) => {
+			// Check for tiny/straight angles or inner mainRoads
+			const hasInnerEdge = connectedMainRoads.some((e) => {
 				const other = e.from[0] === point[0] && e.from[1] === point[1] ? e.to : e.from;
 				if (other === curr || other === next) return false;
 				const a = Math.atan2(other[1] - point[1], other[0] - point[0]);
