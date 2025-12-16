@@ -236,8 +236,7 @@ export function mergeColinearMainRoads(mainRoads) {
 
 // ############################   Drawing   #############################
 
-export function drawBackground(canvasSize) {
-	const canvas = document.getElementById("background");
+export function drawBackground(canvas, canvasSize) {
 	const ctx = canvas.getContext("2d");
 
 	const noise2D = createNoise2D();
@@ -302,8 +301,7 @@ export function drawBackground(canvasSize) {
 	ctx.drawImage(offCanvas, 0, 0, canvasSize, canvasSize);
 }
 
-export function drawMainRoads(mainRoads, accessRoads, roadWidth, roadRadius, canvasSize) {
-	const canvas = document.getElementById("roads");
+export function drawMainRoads(canvas, mainRoads, accessRoads, roadWidth, roadRadius, canvasSize) {
 	const ctx = canvas.getContext("2d");
 	ctx.clearRect(0, 0, canvasSize, canvasSize);
 
@@ -512,13 +510,12 @@ function convexHull(points) {
 	return lower.concat(upper);
 }
 
-export function drawSimpleShadows(
+export function drawSimpleShadows(canvas,
 	{ x, y, angle },
 	{ spriteScale, spriteWidth, spriteHeight },
 	shadowAngle,
 	shadowLength
 ) {
-	const canvas = document.getElementById("houses");
 	const ctx = canvas.getContext("2d");
 
 	const rectW = spriteWidth * spriteScale;
@@ -566,12 +563,11 @@ export function drawSimpleShadows(
 	ctx.restore();
 }
 
-export function drawHouses(
+export function drawHouses(canvas,
 	{ x, y, angle, spriteIndex },
 	{ spriteScale, spriteWidth, spriteHeight, spritesPerRow },
 	houseSheet
 ) {
-	const canvas = document.getElementById("houses");
 	const ctx = canvas.getContext("2d");
 
 	const rectW = spriteWidth * spriteScale;
@@ -589,13 +585,12 @@ export function drawHouses(
 	ctx.restore();
 }
 
-export function drawBlurredShadows(
+export function drawBlurredShadows(canvas,
 	{ x, y, angle },
 	{ spriteScale, spriteWidth, spriteHeight },
 	shadowAngle,
 	shadowLength
 ) {
-	const canvas = document.getElementById("houses");
 	const ctx = canvas.getContext("2d");
 
 	const rectW = spriteWidth * spriteScale;
