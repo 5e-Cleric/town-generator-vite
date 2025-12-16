@@ -6,7 +6,7 @@ function makeMap(points, canvasSize, roadStep, numSprites, spriteScale, spriteHe
 
 	console.log("running makeMap");
 
-	const minDistanceFromEdge = roadStep +100;
+	const minDistanceFromEdge = roadStep +10;
 	const filteredPoints = points.filter(
 		([x, y]) =>
 			x > minDistanceFromEdge &&
