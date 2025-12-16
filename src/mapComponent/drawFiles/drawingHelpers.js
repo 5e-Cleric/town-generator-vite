@@ -74,7 +74,7 @@ export function filterMainRoads(mainRoads, canvasSize) {
 
 export function getMainRoads(points, canvasSize) {
 	const unFilteredMainRoads = [];
-		const voronoi = Delaunay.from(points).voronoi([0, 0, canvasSize, canvasSize]);
+	const voronoi = Delaunay.from(points).voronoi([0, 0, canvasSize, canvasSize]);
 
 	for (let i = 0; i < points.length; i++) {
 		const poly = voronoi.cellPolygon(i);
@@ -510,14 +510,13 @@ function convexHull(points) {
 	return lower.concat(upper);
 }
 
-export function drawSimpleShadows(canvas,
+export function drawSimpleShadows(
+	ctx,
 	{ x, y, angle },
 	{ spriteScale, spriteWidth, spriteHeight },
 	shadowAngle,
 	shadowLength
 ) {
-	const ctx = canvas.getContext("2d");
-
 	const rectW = spriteWidth * spriteScale;
 	const rectH = spriteHeight * spriteScale;
 
@@ -563,13 +562,12 @@ export function drawSimpleShadows(canvas,
 	ctx.restore();
 }
 
-export function drawHouses(canvas,
+export function drawHouses(
+	ctx,
 	{ x, y, angle, spriteIndex },
 	{ spriteScale, spriteWidth, spriteHeight, spritesPerRow },
 	houseSheet
 ) {
-	const ctx = canvas.getContext("2d");
-
 	const rectW = spriteWidth * spriteScale;
 	const rectH = spriteHeight * spriteScale;
 	const sx = (spriteIndex % spritesPerRow) * spriteWidth;
@@ -585,14 +583,13 @@ export function drawHouses(canvas,
 	ctx.restore();
 }
 
-export function drawBlurredShadows(canvas,
+export function drawBlurredShadows(
+	ctx,
 	{ x, y, angle },
 	{ spriteScale, spriteWidth, spriteHeight },
 	shadowAngle,
 	shadowLength
 ) {
-	const ctx = canvas.getContext("2d");
-
 	const rectW = spriteWidth * spriteScale;
 	const rectH = spriteHeight * spriteScale;
 
