@@ -51,7 +51,7 @@ body {
 		align-items: center;
 		overflow: hidden;
 
-		.sidebar {
+		> .sidebar {
 			position: relative;
 			background: #222;
 			padding: 30px;
@@ -229,7 +229,7 @@ body {
 			}
 		}
 
-		.canvasHolder {
+		> .canvasHolder {
 			margin-inline: auto;
 			width: fit-content;
 			height: fit-content;
@@ -301,6 +301,19 @@ body {
 					box-shadow: 1px 4px 14px #000000;
 				}
 			}
+		}
+
+		> .error {
+			position:absolute;
+			top:0;
+			left:50%;
+			translate:-50% 0;
+			padding:4px 10px;
+			border:2px solid #ccc;
+			border-top:none;
+			background:rgb(206, 79, 79);
+			border-bottom-left-radius: 10px;
+			border-bottom-right-radius: 10px;
 		}
 	}
 

@@ -12,18 +12,20 @@ export const MapProvider = ({ children }) => {
 	const spriteHeight = 64;
 	const spritesPerRow = 8;
 
+	const [devMode, setDevMode] = useState(false);
+
 	const [mapSettings, setSettings] = useState({
 		canvasSize: 600,
 		roadStep: 60,
 		noiseScale: 0.1,
 		roadThreshold: 0,
 		roadWidth: 10,
-		roadRadius: 10,
+		roadRadius: 5,
 		spriteScale: 0.5,
 		numSprites: 8,
 		shadowType: "simpleShadows",
 		shadowAngle:2,
-		shadowLength:1,
+		shadowLength:18,
 	});
 
 	//settings that warrant a recalculation of the road structure
@@ -81,12 +83,20 @@ export const MapProvider = ({ children }) => {
 		localStorage.setItem('shadowLength', mapSettings.shadowLength);
 	}, [mapSettings, settingsLoaded]);
 
+	function renderError() {
+		if (!error) return null;
+
+		return <div className="error">Error {error.errorCode}: {error.errorText}</div>
+	}
+
 	return (
 		<MapContext.Provider
 			value={{
 				error,
 				setError,
-
+				devMode,
+				setDevMode,
+				
 				mapSettings,
 				setSettings,
 
@@ -95,6 +105,7 @@ export const MapProvider = ({ children }) => {
 				spriteHeight,
 				spritesPerRow,
 			}}>
+				{renderError()}
 			{children}
 		</MapContext.Provider>
 	);

@@ -2,7 +2,7 @@ import { useContext } from "react";
 import { MapContext } from "./mapContext.jsx";
 
 function RenderMapSettings() {
-	const { mapSettings, setSettings } = useContext(MapContext);
+	const { devMode, setDevMode, mapSettings, setSettings } = useContext(MapContext);
 
 	const roadStepMaximum = 200;
 
@@ -36,6 +36,10 @@ function RenderMapSettings() {
 					<label>
 						<p>Canvas Size:</p>
 						<input type="number" id="canvasSize" value={mapSettings.canvasSize} onChange={handleChange} />
+					</label>
+					<label>
+						<p>Dev mode:</p>
+						<input type="checkbox" id="devMode" value={devMode} onChange={()=> setDevMode(!devMode)} />
 					</label>
 				</fieldset>
 				<details>

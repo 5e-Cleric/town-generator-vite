@@ -2,11 +2,9 @@ import { getMainRoads, getHousePoints, getAccessRoads } from "./drawingHelpers";
 
 function makeMap(points, canvasSize, roadStep, numSprites, spriteScale, spriteHeight) {
 	if (!points || points.length === 0) return null;
-	if (points.length > 500) throw new Error("This map is too big, sorry!");
-
-	console.log("running makeMap");
-
-	const minDistanceFromEdge = roadStep +10;
+	if (points.length > 500) return null;
+		
+	const minDistanceFromEdge = roadStep + 10;
 	const filteredPoints = points.filter(
 		([x, y]) =>
 			x > minDistanceFromEdge &&

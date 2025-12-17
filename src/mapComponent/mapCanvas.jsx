@@ -15,6 +15,9 @@ function RenderMapCreator() {
 	const {
 		error,
 		setError,
+		devMode,
+		setDevMode,
+
 		mapSettings,
 		points,
 
@@ -67,16 +70,11 @@ function RenderMapCreator() {
 	);
 
 	const safeCanvasSize = Math.min(Math.max(canvasSize, 100), 800);
-
+	const roadColor = "#d8d1bc";
+	const roadOutlineColor = "#809070";
 
 	const map = useMemo(() => {
-		try {
-			return makeMap(points, safeCanvasSize, roadStep, numSprites, spriteScale, spriteHeight);
-		} catch (err) {
-			console.error("Error creating map:", err);
-			setError(err); // now you can show it in your UI
-			return null; // prevent the component from crashing
-		}
+		return makeMap(points, safeCanvasSize, roadStep, numSprites, spriteScale, spriteHeight);
 	}, [points, roadStep, numSprites, spriteScale, spriteHeight]);
 
 	const mainRoads = map?.mainRoads;
@@ -85,32 +83,80 @@ function RenderMapCreator() {
 
 	useEffect(() => {
 		if (!safeCanvasSize || !ctxb) return;
+		if (devMode) {
+			ctxb.clearRect(0, 0, safeCanvasSize, safeCanvasSize);
+			ctxb.fillStyle = "#aaa";
+			ctxb.fillRect(0, 0, safeCanvasSize, safeCanvasSize);
+			return;
+		}
 		drawBackground(ctxb, safeCanvasSize);
-	}, [ctxb, safeCanvasSize]);
+	}, [ctxb, devMode, safeCanvasSize]);
 
 	useEffect(() => {
+		if (!map) setError({ errorCode: "10", errorText: "We couldn't generate this map, sorry" });
 		if (!map || !ctxr || !ctxs || !ctxh) return;
 
+		setError(null);
 		const houseSheet = new Image();
 		houseSheet.src = "assets/images/roofs/spritesheet3.png";
 		houseSheet.onload = async () => {
 			try {
 				ctxr.clearRect(0, 0, safeCanvasSize, safeCanvasSize);
-				drawMainRoads(ctxr, mainRoads, accessRoads, roadWidth, roadRadius, safeCanvasSize);
+				!devMode &&
+					drawMainRoads(
+						ctxr,
+						mainRoads,
+						accessRoads,
+						roadWidth,
+						roadRadius,
+						safeCanvasSize,
+						roadColor,
+						roadOutlineColor
+					);
 				ctxs.clearRect(0, 0, safeCanvasSize, safeCanvasSize);
 				ctxh.clearRect(0, 0, safeCanvasSize, safeCanvasSize);
-				housePoints.forEach((p, i) => {
-					if (shadowType !== "noShadow" && shadowLength > 0) {
-						if (shadowType === "simpleShadow")
-							drawSimpleShadows(ctxs, p, spriteSettings, shadowAngle, shadowLength);
-						if (shadowType === "blurredShadow")
-							drawBlurredShadows(ctxs, p, spriteSettings, shadowAngle, shadowLength);
-					}
+				!devMode &&
+					housePoints.forEach((p, i) => {
+						if (shadowType !== "noShadow" && shadowLength > 0) {
+							if (shadowType === "simpleShadow")
+								drawSimpleShadows(ctxs, p, spriteSettings, shadowAngle, shadowLength);
+							if (shadowType === "blurredShadow")
+								drawBlurredShadows(ctxs, p, spriteSettings, shadowAngle, shadowLength);
+						}
 
-					drawHouses(ctxh, p, spriteSettings, houseSheet);
-				});
+						drawHouses(ctxh, p, spriteSettings, houseSheet);
+					});
 
-				//points.forEach(([x, y]) => {ctxh.fillStyle = 'red';ctxh.fillRect(x, y, roadStep / 10, roadStep / 10);}); //Drawing the points
+				if (devMode) {
+					drawMainRoads(ctxr, mainRoads, accessRoads, 5, 0, safeCanvasSize, "#c679c0ff", null);
+
+					housePoints.forEach((housePoint) => {
+						const rectW = spriteWidth * spriteScale;
+						const rectH = spriteHeight * spriteScale;
+						const hw = rectW / 2;
+						const hh = rectH / 2;
+						ctxh.save();
+						ctxh.translate(housePoint.x, housePoint.y);
+						ctxh.rotate(housePoint.angle);
+
+						// Polygon from center
+						ctxh.beginPath();
+						ctxh.moveTo(-hw, -hh);
+						ctxh.lineTo(hw, -hh);
+						ctxh.lineTo(hw, hh);
+						ctxh.lineTo(-hw, hh);
+						ctxh.closePath();
+						ctxh.fillStyle = `hsl(${Math.random() * 360}, 60%, 55%)`;
+						ctxh.fill();
+						ctxh.clip();
+						ctxh.restore();
+					});
+
+					points.forEach(([x, y]) => {
+						ctxh.fillStyle = "red";
+						ctxh.fillRect(x, y, roadStep / 10, roadStep / 10);
+					}); //Drawing the points
+				}
 			} catch (error) {
 				console.error(error);
 				setError(error);
@@ -120,7 +166,7 @@ function RenderMapCreator() {
 			console.error("Image failed to load");
 		};
 		//fillGrid();
-	}, [map, roadWidth, roadRadius, numSprites, spriteScale, spriteSettings, ctxh, ctxr, ctxs]);
+	}, [map, devMode, roadWidth, roadRadius, numSprites, spriteScale, spriteSettings, ctxh, ctxr, ctxs]);
 
 	useEffect(() => {
 		//redraw shadows

@@ -299,16 +299,27 @@ export function drawBackground(ctx, canvasSize) {
 	ctx.drawImage(offCanvas, 0, 0, canvasSize, canvasSize);
 }
 
-export function drawMainRoads(ctx, mainRoads, accessRoads, roadWidth, roadRadius, canvasSize) {
-	mainRoads.forEach(({ from, to }, i) => {
-		drawEdge(ctx, from[0], from[1], to[0], to[1], roadWidth + 4, "#809070");
-	});
+export function drawMainRoads(
+	ctx,
+	mainRoads,
+	accessRoads,
+	roadWidth,
+	roadRadius,
+	canvasSize,
+	roadColor,
+	roadOutlineColor
+) {
+	roadOutlineColor &&
+		mainRoads.forEach(({ from, to }, i) => {
+			drawEdge(ctx, from[0], from[1], to[0], to[1], roadWidth + 4, roadOutlineColor);
+		});
 
-	roadRadius > 2 && drawEdgeCorners(mainRoads, roadWidth + 3, roadRadius, "#809070", ctx);
+	roadOutlineColor && roadRadius > 2 && drawEdgeCorners(mainRoads, roadWidth + 3, roadRadius, roadOutlineColor, ctx);
 
-	accessRoads.forEach(({ from, to }, i) => {
-		drawEdge(ctx, from[0], from[1], to[0], to[1], (roadWidth + 4) / 2, "#809070");
-	});
+	roadOutlineColor &&
+		accessRoads.forEach(({ from, to }, i) => {
+			drawEdge(ctx, from[0], from[1], to[0], to[1], (roadWidth + 4) / 2, roadOutlineColor);
+		});
 
 	const tempCanvas = document.createElement("canvas");
 	tempCanvas.width = canvasSize;
@@ -316,12 +327,12 @@ export function drawMainRoads(ctx, mainRoads, accessRoads, roadWidth, roadRadius
 	const tempCtx = tempCanvas.getContext("2d");
 
 	mainRoads.forEach(({ from, to }) => {
-		drawEdge(tempCtx, from[0], from[1], to[0], to[1], roadWidth, "#d8d1bc");
+		drawEdge(tempCtx, from[0], from[1], to[0], to[1], roadWidth, roadColor);
 	});
-	roadRadius > 2 && drawEdgeCorners(mainRoads, roadWidth, roadRadius, "#d8d1bc", tempCtx);
+	roadRadius > 2 && drawEdgeCorners(mainRoads, roadWidth, roadRadius, roadColor, tempCtx);
 
 	accessRoads.forEach(({ from, to }, i) => {
-		drawEdge(tempCtx, from[0], from[1], to[0], to[1], roadWidth / 2, "#d8d1bc");
+		drawEdge(tempCtx, from[0], from[1], to[0], to[1], roadWidth / 2, roadColor);
 	});
 
 	function drawEdge(canvas, x0, y0, x1, y1, width, color) {
