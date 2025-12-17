@@ -4,7 +4,7 @@ import { MapContext } from "./mapContext.jsx";
 function RenderMapSettings() {
 	const { mapSettings, setSettings } = useContext(MapContext);
 
-	const roadStepMaximum = 180;
+	const roadStepMaximum = 200;
 
 	function handleChange(e) {
 		const { id, name, value, type } = e.target;
@@ -45,9 +45,9 @@ function RenderMapSettings() {
 						<input
 							type="range"
 							id="roadStep"
-							min="10"
+							min="40"
 							max={roadStepMaximum.toString()}
-							step="1"
+							step="5"
 							value={roadStepMaximum - mapSettings.roadStep}
 							onChange={handleChange}
 						/>
@@ -60,7 +60,7 @@ function RenderMapSettings() {
 							id="roadWidth"
 							min="5"
 							max="20"
-							step="0.1"
+							step="0.2"
 							value={mapSettings.roadWidth}
 							unit="px"
 							onChange={handleChange}
@@ -72,7 +72,7 @@ function RenderMapSettings() {
 						<input
 							type="range"
 							id="roadRadius"
-							min="1"
+							min="0"
 							max="20"
 							step="0.1"
 							value={mapSettings.roadRadius}
@@ -91,7 +91,7 @@ function RenderMapSettings() {
 							id="spriteScale"
 							min="0.2"
 							max="1.5"
-							step="0.02"
+							step="0.1"
 							value={mapSettings.spriteScale}
 							onChange={handleChange}
 						/>
@@ -138,7 +138,7 @@ function RenderMapSettings() {
 							id="shadowAngle"
 							min="0"
 							max={(2 * Math.PI).toString()}
-							step="0.1"
+							step="0,785398"
 							value={mapSettings.shadowAngle}
 							unit="rad"
 							onChange={handleChange}

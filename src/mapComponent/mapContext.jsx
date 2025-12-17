@@ -29,6 +29,8 @@ export const MapProvider = ({ children }) => {
 	//settings that warrant a recalculation of the road structure
 	const { canvasSize, roadStep, noiseScale, roadThreshold } = mapSettings;
 
+	const safeCanvasSize = Math.min(Math.max(canvasSize, 100), 800);
+
 	const [points, setPoints] = useState([]);
 
 	const [settingsLoaded, setSettingsLoaded] = useState(false);
@@ -64,7 +66,7 @@ export const MapProvider = ({ children }) => {
 		}
 
 		setPoints(newPoints);
-	}, [canvasSize, roadStep, noiseScale, roadThreshold, settingsLoaded]);
+	}, [safeCanvasSize, roadStep, noiseScale, roadThreshold, settingsLoaded]);
 
 	useEffect(() => {
 		if (!settingsLoaded) return;

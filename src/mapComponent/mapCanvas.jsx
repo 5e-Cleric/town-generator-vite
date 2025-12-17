@@ -66,18 +66,27 @@ function RenderMapCreator() {
 		[shadowType, shadowAngle, shadowLength]
 	);
 
+	const safeCanvasSize = Math.min(Math.max(canvasSize, 100), 800);
+
+
 	const map = useMemo(() => {
-		return makeMap(points, canvasSize, roadStep, numSprites, spriteScale, spriteHeight);
-	}, [points, roadStep, numSprites, spriteScale, spriteHeight]); //points depends on canvasSize
+		try {
+			return makeMap(points, safeCanvasSize, roadStep, numSprites, spriteScale, spriteHeight);
+		} catch (err) {
+			console.error("Error creating map:", err);
+			setError(err); // now you can show it in your UI
+			return null; // prevent the component from crashing
+		}
+	}, [points, roadStep, numSprites, spriteScale, spriteHeight]);
 
 	const mainRoads = map?.mainRoads;
 	const housePoints = map?.housePoints;
 	const accessRoads = map?.accessRoads;
 
 	useEffect(() => {
-		if (!canvasSize || !ctxb) return;
-		drawBackground(ctxb, canvasSize);
-	}, [ctxb, canvasSize]);
+		if (!safeCanvasSize || !ctxb) return;
+		drawBackground(ctxb, safeCanvasSize);
+	}, [ctxb, safeCanvasSize]);
 
 	useEffect(() => {
 		if (!map || !ctxr || !ctxs || !ctxh) return;
@@ -86,10 +95,10 @@ function RenderMapCreator() {
 		houseSheet.src = "assets/images/roofs/spritesheet3.png";
 		houseSheet.onload = async () => {
 			try {
-				ctxr.clearRect(0, 0, canvasSize, canvasSize);
-				drawMainRoads(ctxr, mainRoads, accessRoads, roadWidth, roadRadius, canvasSize);
-				ctxs.clearRect(0, 0, canvasSize, canvasSize);
-				ctxh.clearRect(0, 0, canvasSize, canvasSize);
+				ctxr.clearRect(0, 0, safeCanvasSize, safeCanvasSize);
+				drawMainRoads(ctxr, mainRoads, accessRoads, roadWidth, roadRadius, safeCanvasSize);
+				ctxs.clearRect(0, 0, safeCanvasSize, safeCanvasSize);
+				ctxh.clearRect(0, 0, safeCanvasSize, safeCanvasSize);
 				housePoints.forEach((p, i) => {
 					if (shadowType !== "noShadow" && shadowLength > 0) {
 						if (shadowType === "simpleShadow")
@@ -118,7 +127,7 @@ function RenderMapCreator() {
 		if (!points || points.length === 0 || !map) return;
 		if (!mapSettings) return;
 		if (shadowType === "noShadow") return;
-		ctxs.clearRect(0, 0, canvasSize, canvasSize);
+		ctxs.clearRect(0, 0, safeCanvasSize, safeCanvasSize);
 		housePoints.forEach((p, i) => {
 			if (shadowType !== "noShadow" && shadowLength > 0) {
 				if (shadowType === "simpleShadow")
@@ -132,8 +141,8 @@ function RenderMapCreator() {
 	function fillGrid() {
 		const xLabels = document.querySelector(".grid .xLabels");
 		const yLabels = document.querySelector(".grid .yLabels");
-		const width = canvasSize;
-		const height = canvasSize;
+		const width = safeCanvasSize;
+		const height = safeCanvasSize;
 		const step = 100;
 
 		xLabels.innerHTML = "";
@@ -159,7 +168,7 @@ function RenderMapCreator() {
 	}
 
 	return (
-		<div className="canvasHolder" style={{ height: canvasSize, width: canvasSize }}>
+		<div className="canvasHolder" style={{ height: safeCanvasSize, width: safeCanvasSize }}>
 			<div className="grid">
 				<div className="xLabels"></div>
 				<div className="yLabels"></div>
@@ -178,14 +187,14 @@ function RenderMapCreator() {
 				</filter>
 			</svg>
 
-			<canvas ref={layers.background} height={canvasSize} width={canvasSize}></canvas>
+			<canvas ref={layers.background} height={safeCanvasSize} width={safeCanvasSize}></canvas>
 			<canvas
 				ref={layers.roads}
-				height={canvasSize}
-				width={canvasSize}
+				height={safeCanvasSize}
+				width={safeCanvasSize}
 				style={{ filter: "url(#pencil-filter-)" }}></canvas>
-			<canvas ref={layers.shadows} height={canvasSize} width={canvasSize}></canvas>
-			<canvas ref={layers.houses} height={canvasSize} width={canvasSize}></canvas>
+			<canvas ref={layers.shadows} height={safeCanvasSize} width={safeCanvasSize}></canvas>
+			<canvas ref={layers.houses} height={safeCanvasSize} width={safeCanvasSize}></canvas>
 
 			{
 				//	<div className="redGrid"></div>
