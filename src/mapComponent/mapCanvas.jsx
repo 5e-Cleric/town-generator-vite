@@ -20,6 +20,7 @@ function RenderMapCreator() {
 
 		mapSettings,
 		points,
+		negativePoints,
 
 		spriteWidth,
 		spriteHeight,
@@ -102,30 +103,8 @@ function RenderMapCreator() {
 		houseSheet.onload = async () => {
 			try {
 				ctxr.clearRect(0, 0, safeCanvasSize, safeCanvasSize);
-				!devMode &&
-					drawMainRoads(
-						ctxr,
-						mainRoads,
-						accessRoads,
-						roadWidth,
-						roadRadius,
-						safeCanvasSize,
-						roadColor,
-						roadOutlineColor
-					);
 				ctxs.clearRect(0, 0, safeCanvasSize, safeCanvasSize);
 				ctxh.clearRect(0, 0, safeCanvasSize, safeCanvasSize);
-				!devMode &&
-					housePoints.forEach((p, i) => {
-						if (shadowType !== "noShadow" && shadowLength > 0) {
-							if (shadowType === "simpleShadow")
-								drawSimpleShadows(ctxs, p, spriteSettings, shadowAngle, shadowLength);
-							if (shadowType === "blurredShadow")
-								drawBlurredShadows(ctxs, p, spriteSettings, shadowAngle, shadowLength);
-						}
-
-						drawHouses(ctxh, p, spriteSettings, houseSheet);
-					});
 
 				if (devMode) {
 					drawMainRoads(ctxr, mainRoads, accessRoads, 5, 0, safeCanvasSize, "#c679c0ff", null);
@@ -156,6 +135,32 @@ function RenderMapCreator() {
 						ctxh.fillStyle = "red";
 						ctxh.fillRect(x, y, roadStep / 10, roadStep / 10);
 					}); //Drawing the points
+
+					negativePoints.forEach(([x, y]) => {
+						ctxh.fillStyle = "blue";
+						ctxh.fillRect(x, y, roadStep / 10, roadStep / 10);
+					}); //Drawing the points
+				} else {
+					drawMainRoads(
+						ctxr,
+						mainRoads,
+						accessRoads,
+						roadWidth,
+						roadRadius,
+						safeCanvasSize,
+						roadColor,
+						roadOutlineColor
+					);
+					housePoints.forEach((p, i) => {
+						if (shadowType !== "noShadow" && shadowLength > 0) {
+							if (shadowType === "simpleShadow")
+								drawSimpleShadows(ctxs, p, spriteSettings, shadowAngle, shadowLength);
+							if (shadowType === "blurredShadow")
+								drawBlurredShadows(ctxs, p, spriteSettings, shadowAngle, shadowLength);
+						}
+
+						drawHouses(ctxh, p, spriteSettings, houseSheet);
+					});
 				}
 			} catch (error) {
 				console.error(error);
@@ -170,7 +175,7 @@ function RenderMapCreator() {
 
 	useEffect(() => {
 		//redraw shadows
-		if (!points || points.length === 0 || !map) return;
+		if (!points || points.length === 0 || !map || devMode) return;
 		if (!mapSettings) return;
 		if (shadowType === "noShadow") return;
 		ctxs.clearRect(0, 0, safeCanvasSize, safeCanvasSize);
