@@ -19,7 +19,7 @@ function RenderMapCreator() {
 
 		mapSettings,
 		points,
-		negativePoints,
+		densePoints,
 
 		spriteWidth,
 		spriteHeight,
@@ -84,8 +84,8 @@ function RenderMapCreator() {
 	const accessRoads = map?.accessRoads;
 
 	const treePoints = useMemo(() => {
-		return getTreePoints(negativePoints, safeCanvasSize, mainRoads, housePoints);
-	}, [negativePoints, mainRoads, housePoints]);
+		return getTreePoints(densePoints, safeCanvasSize, mainRoads, housePoints);
+	}, [densePoints, mainRoads, housePoints]);
 
 	useEffect(() => {
 		if (!safeCanvasSize || !ctxb) return;
@@ -93,16 +93,10 @@ function RenderMapCreator() {
 	}, [ctxb, safeCanvasSize]);
 
 	useEffect(() => {
-		if (!treePoints || !ctxt) return;
-		ctxt.clearRect(0, 0, safeCanvasSize, safeCanvasSize);
-		drawTrees(ctxt, treePoints);
-	}, [ctxt, safeCanvasSize, treePoints]);
-
-	useEffect(() => {
 		if (!map) setError({ errorCode: "10", errorText: "We couldn't generate this map, sorry" });
 		if (!map || !ctxr || !ctxs || !ctxh) return;
 
-		setError(null);
+		if (error?.errorCode === "10")setError(null);
 		const houseSheet = new Image();
 		houseSheet.src = "assets/images/roofs/spritesheet3.png";
 		houseSheet.onload = async () => {
@@ -157,6 +151,16 @@ function RenderMapCreator() {
 			}
 		});
 	}, [ctxs, shadowSettings]);
+
+	useEffect(() => {
+		if (!treePoints || treePoints.length > 50)
+			setError({ errorCode: "11", errorText: "We couldn't generate the trees, sorry" });
+		if (!treePoints || treePoints.length > 200 || !ctxt || !map) return;
+
+		if (error?.errorCode === "11") setError(null);
+		ctxt.clearRect(0, 0, safeCanvasSize, safeCanvasSize);
+		drawTrees(ctxt, treePoints);
+	}, [ctxt, safeCanvasSize, treePoints]);
 
 	function fillGrid() {
 		const xLabels = document.querySelector(".grid .xLabels");

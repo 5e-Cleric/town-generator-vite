@@ -4,7 +4,7 @@ export function makeMap(points, canvasSize, roadStep, numSprites, spriteScale, s
 	if (!points || points.length === 0) return null;
 	if (points.length > 500) return null;
 
-	const minDistanceFromEdge = roadStep + roadStep*1.5;
+	const minDistanceFromEdge = roadStep + roadStep * 1.5;
 	const filteredPoints = points.filter(
 		([x, y]) =>
 			x > minDistanceFromEdge &&
@@ -38,10 +38,10 @@ export function makeMap(points, canvasSize, roadStep, numSprites, spriteScale, s
 	};
 }
 
-export function getTreePoints(negativePoints, canvasSize, mainRoads, housePoints) {
-	if (!negativePoints || negativePoints.length === 0) return null;
+export function getTreePoints(points, canvasSize, mainRoads, housePoints) {
+	if (!points || points.length === 0) return null;
 
-	const minDistSq = 40 ** 2;
+	const minDistSq = 70 ** 2;
 
 	const distSq = (a, b) => {
 		const ax = a[0],
@@ -72,7 +72,7 @@ export function getTreePoints(negativePoints, canvasSize, mainRoads, housePoints
 		return (px - closest.x) ** 2 + (py - closest.y) ** 2;
 	};
 
-	return negativePoints.filter((p) => {
+	const finalPoints = points.filter((p) => {
 		for (const h of housePoints || []) {
 			if (distSq(p, h) < minDistSq) return false;
 		}
@@ -85,4 +85,15 @@ export function getTreePoints(negativePoints, canvasSize, mainRoads, housePoints
 
 		return true;
 	});
+
+	const tiledTrees = () => {
+		let newTiledTrees = [];
+		finalPoints.forEach((point) => {
+			for (const f of finalPoints || []) {
+				
+			}
+		});
+	};
+
+	return finalPoints;
 }

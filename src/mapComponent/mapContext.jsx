@@ -32,7 +32,7 @@ export const MapProvider = ({ children }) => {
 	const safeCanvasSize = Math.min(Math.max(canvasSize, 100), 800);
 
 	const [points, setPoints] = useState([]);
-	const [negativePoints, setNegativePoints] = useState([]);
+	const [densePoints, setDensePoints] = useState([]);
 
 	const [settingsLoaded, setSettingsLoaded] = useState(false);
 
@@ -57,20 +57,32 @@ export const MapProvider = ({ children }) => {
 		if (!settingsLoaded) return;
 
 		const newPoints = [];
-		const negatives = [];
 		for (let x = 0; x < canvasSize; x += roadStep) {
 			for (let y = 0; y < canvasSize; y += roadStep) {
 				const noiseVal = noise2D(x * noiseScale, y * noiseScale);
 				if (noiseVal > roadThreshold) {
 					newPoints.push([x, y]);
-				} else {
-					negatives.push([x, y]);
 				}
 			}
 		}
 
 		setPoints(newPoints);
-		setNegativePoints(negatives);
+	}, [safeCanvasSize, roadStep, noiseScale, roadThreshold, settingsLoaded]);
+
+	useEffect(() => {
+		if (!settingsLoaded) return;
+
+		const newPoints = [];
+		for (let x = 0; x < canvasSize; x += roadStep/2) {
+			for (let y = 0; y < canvasSize; y += roadStep/2) {
+				const noiseVal = noise2D(x * noiseScale, y * noiseScale);
+				if (noiseVal > roadThreshold) {
+					newPoints.push([x, y]);
+				}
+			}
+		}
+
+		setDensePoints(newPoints);
 	}, [safeCanvasSize, roadStep, noiseScale, roadThreshold, settingsLoaded]);
 
 	useEffect(() => {
@@ -105,7 +117,7 @@ export const MapProvider = ({ children }) => {
 				setSettings,
 
 				points,
-				negativePoints,
+				densePoints,
 				spriteWidth,
 				spriteHeight,
 				spritesPerRow,
