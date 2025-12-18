@@ -38,8 +38,8 @@ export function makeMap(points, canvasSize, roadStep, numSprites, spriteScale, s
 	};
 }
 
-export function getTreePoints(points, canvasSize, mainRoads, housePoints, roadStep) {
-	if (!points || points.length === 0) return null;
+export function getTreePoints(densePoints, canvasSize, mainRoads, housePoints, roadStep) {
+	if (!densePoints || densePoints.length === 0) return null;
 
 	const minDistSq = 50 ** 2;
 
@@ -72,7 +72,7 @@ export function getTreePoints(points, canvasSize, mainRoads, housePoints, roadSt
 		return (px - closest.x) ** 2 + (py - closest.y) ** 2;
 	};
 
-	const finalPoints = points.filter((p) => {
+	const finalPoints = densePoints.filter((p) => {
 		for (const h of housePoints || []) {
 			if (distSq(p, h) < minDistSq) return false;
 		}
@@ -94,26 +94,31 @@ export function getTreePoints(points, canvasSize, mainRoads, housePoints, roadSt
 	};
 
 	const getSideAngle = ({ top, right, bottom, left }) => {
-		if (top && !bottom) return 0;
-		if (right && !left) return 90;
-		if (bottom && !top) return 180;
-		if (left && !right) return 270;
+		if (top && !bottom) return "top";
+		if (right && !left) return "right";
+		if (bottom && !top) return "bottom";
+		if (left && !right) return "left";
 
-		if (left && right) return 90;
-		if (top && bottom) return 0;
+		if (left && right) return "leftRight";
+		if (top && bottom) return "topBottom";
 	};
 
 	const tiledTrees = () => {
 		const points = finalPoints.map(([x, y]) => ({ x, y }));
 
 		const newTiledTrees = [];
+		const hasPoint = (x, y) => {
+			const found = points.some((p) => p.x === x && p.y === y);
+			console.log(`hasPoint(${x}, ${y}) →`, found);
+			return found;
+		};
 
-		const hasPoint = (x, y) => points.some((p) => p.x === x && p.y === y);
-
-		const dist = roadStep / 2;
+		const dist = Math.round(roadStep / 2);
 
 		points.forEach((point) => {
 			const { x, y } = point;
+			console.log("Checking neighbors for:", x, y);
+
 
 			const neighbors = {
 				top: hasPoint(x, y - dist),
