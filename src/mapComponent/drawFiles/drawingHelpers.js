@@ -735,6 +735,11 @@ export function drawTrees(ctx, treePoints) {
 			default:
 				break;
 		}
+
+		//draw tiles
+		//set range of tiles from sprite
+		//rotate on angle
+
 		ctx.save();
 		ctx.beginPath();
 		ctx.arc(x, y, radius, 0, Math.PI * 2);
