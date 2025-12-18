@@ -12,8 +12,6 @@ export const MapProvider = ({ children }) => {
 	const spriteHeight = 64;
 	const spritesPerRow = 8;
 
-	const [devMode, setDevMode] = useState(false);
-
 	const [mapSettings, setSettings] = useState({
 		canvasSize: 600,
 		roadStep: 60,
@@ -103,9 +101,6 @@ export const MapProvider = ({ children }) => {
 			value={{
 				error,
 				setError,
-				devMode,
-				setDevMode,
-
 				mapSettings,
 				setSettings,
 
