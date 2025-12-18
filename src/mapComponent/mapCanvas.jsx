@@ -84,7 +84,7 @@ function RenderMapCreator() {
 	const accessRoads = map?.accessRoads;
 
 	const treePoints = useMemo(() => {
-		return getTreePoints(densePoints, safeCanvasSize, mainRoads, housePoints);
+		return getTreePoints(densePoints, safeCanvasSize, mainRoads, housePoints, roadStep);
 	}, [densePoints, mainRoads, housePoints]);
 
 	useEffect(() => {

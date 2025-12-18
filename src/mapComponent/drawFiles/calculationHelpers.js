@@ -38,10 +38,10 @@ export function makeMap(points, canvasSize, roadStep, numSprites, spriteScale, s
 	};
 }
 
-export function getTreePoints(points, canvasSize, mainRoads, housePoints) {
+export function getTreePoints(points, canvasSize, mainRoads, housePoints, roadStep) {
 	if (!points || points.length === 0) return null;
 
-	const minDistSq = 70 ** 2;
+	const minDistSq = 50 ** 2;
 
 	const distSq = (a, b) => {
 		const ax = a[0],
@@ -110,14 +110,16 @@ export function getTreePoints(points, canvasSize, mainRoads, housePoints) {
 
 		const hasPoint = (x, y) => points.some((p) => p.x === x && p.y === y);
 
+		const dist = roadStep / 2;
+
 		points.forEach((point) => {
 			const { x, y } = point;
 
 			const neighbors = {
-				top: hasPoint(x, y - 1),
-				right: hasPoint(x + 1, y),
-				bottom: hasPoint(x, y + 1),
-				left: hasPoint(x - 1, y),
+				top: hasPoint(x, y - dist),
+				right: hasPoint(x + dist, y),
+				bottom: hasPoint(x, y + dist),
+				left: hasPoint(x - dist, y),
 			};
 
 			const count = Object.values(neighbors).filter(Boolean).length;

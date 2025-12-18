@@ -716,22 +716,31 @@ function drawBlurredSlices(ctx, polygon, shadowAngle, shadowLength) {
 export function drawTrees(ctx, treePoints) {
 	if (!treePoints || treePoints.length === 0) return null;
 
-	const radius = 50;
-	treePoints.forEach(({x, y}) => {
+	const radius = 10;
+	treePoints.forEach(({ x, y, tile, angle }) => {
 		ctx.save();
 		ctx.beginPath();
 		ctx.arc(x, y, radius, 0, Math.PI * 2);
-		ctx.fillStyle = "#2d712d";
 		ctx.fill();
 		ctx.restore();
 		ctx.save();
 
-		ctx.fillStyle = "blue";
-		ctx.fillRect(x, y, 5, 5);
-	});
+		switch (tile) {
+			case "center":
+				ctx.fillStyle = "blue";
+				break;
+			case "side":
+				ctx.fillStyle = "red";
+				break;
+			case "corner":
+				ctx.fillStyle = "green";
+				break;
+			case "lone":
+				ctx.fillStyle = "white";
+				break;
 
-	treePoints.forEach(({x, y}) => {
-		ctx.fillStyle = "blue";
-		ctx.fillRect(x, y, 5, 5);
-	}); //Drawing the points
+			default:
+				break;
+		}
+	});
 }
