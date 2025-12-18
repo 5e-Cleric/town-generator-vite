@@ -717,7 +717,7 @@ export function drawTrees(ctx, treePoints) {
 	if (!treePoints || treePoints.length === 0) return null;
 
 	const radius = 50;
-	treePoints.forEach(([x, y]) => {
+	treePoints.forEach(({x, y}) => {
 		ctx.save();
 		ctx.beginPath();
 		ctx.arc(x, y, radius, 0, Math.PI * 2);
@@ -730,7 +730,7 @@ export function drawTrees(ctx, treePoints) {
 		ctx.fillRect(x, y, 5, 5);
 	});
 
-	treePoints.forEach(([x, y]) => {
+	treePoints.forEach(({x, y}) => {
 		ctx.fillStyle = "blue";
 		ctx.fillRect(x, y, 5, 5);
 	}); //Drawing the points

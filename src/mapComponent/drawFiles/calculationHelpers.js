@@ -86,14 +86,78 @@ export function getTreePoints(points, canvasSize, mainRoads, housePoints) {
 		return true;
 	});
 
-	const tiledTrees = () => {
-		let newTiledTrees = [];
-		finalPoints.forEach((point) => {
-			for (const f of finalPoints || []) {
-				
-			}
-		});
+	const getCornerAngle = ({ top, right, bottom, left }) => {
+		if (top && right) return 0;
+		if (right && bottom) return 90;
+		if (bottom && left) return 180;
+		if (left && top) return 270;
 	};
 
-	return finalPoints;
+	const getSideAngle = ({ top, right, bottom, left }) => {
+		if (top && !bottom) return 0;
+		if (right && !left) return 90;
+		if (bottom && !top) return 180;
+		if (left && !right) return 270;
+
+		if (left && right) return 90;
+		if (top && bottom) return 0;
+	};
+
+	const tiledTrees = () => {
+		const points = finalPoints.map(([x, y]) => ({ x, y }));
+
+		const newTiledTrees = [];
+
+		const hasPoint = (x, y) => points.some((p) => p.x === x && p.y === y);
+
+		points.forEach((point) => {
+			const { x, y } = point;
+
+			const neighbors = {
+				top: hasPoint(x, y - 1),
+				right: hasPoint(x + 1, y),
+				bottom: hasPoint(x, y + 1),
+				left: hasPoint(x - 1, y),
+			};
+
+			const count = Object.values(neighbors).filter(Boolean).length;
+
+			let tile = "lone";
+			let angle = null;
+
+			if (count === 0) {
+				tile = "lone";
+			} else if (count === 4) {
+				tile = "center";
+			} else if (count === 3) {
+				tile = "side";
+				angle = getSideAngle(neighbors);
+			} else if (count === 2) {
+				const isOpposite = (neighbors.top && neighbors.bottom) || (neighbors.left && neighbors.right);
+
+				if (isOpposite) {
+					tile = "side";
+					angle = getSideAngle(neighbors);
+				} else {
+					tile = "corner";
+					angle = getCornerAngle(neighbors);
+				}
+			} else if (count === 1) {
+				tile = "side";
+				angle = getSideAngle(neighbors);
+			}
+
+			newTiledTrees.push({
+				x,
+				y,
+				tile,
+				...(angle !== null && { angle }),
+			});
+		});
+
+		console.log(newTiledTrees);
+		return newTiledTrees;
+	};
+
+	return tiledTrees();
 }
