@@ -2,13 +2,14 @@ import { useContext, useEffect, useMemo, useRef } from "react";
 
 import { MapContext } from "./mapContext.jsx";
 //import drawNoise from "./drawFiles/drawNoise.jsx";
-import makeMap from "./drawFiles/makeMap.js";
+import {makeMap, getTreePoints} from "./drawFiles/calculationHelpers.js";
 import {
 	drawBackground,
 	drawMainRoads,
 	drawHouses,
 	drawSimpleShadows,
 	drawBlurredShadows,
+	drawTrees,
 } from "./drawFiles/drawingHelpers";
 
 function RenderMapCreator() {
@@ -32,11 +33,13 @@ function RenderMapCreator() {
 		roads: useRef(null),
 		shadows: useRef(null),
 		houses: useRef(null),
+		trees: useRef(null),
 	};
 	const ctxb = layers.background.current?.getContext("2d");
 	const ctxr = layers.roads.current?.getContext("2d");
 	const ctxs = layers.shadows.current?.getContext("2d");
 	const ctxh = layers.houses.current?.getContext("2d");
+	const ctxt = layers.trees.current?.getContext("2d");
 
 	const {
 		canvasSize,
@@ -82,6 +85,10 @@ function RenderMapCreator() {
 	const housePoints = map?.housePoints;
 	const accessRoads = map?.accessRoads;
 
+	const treePoints = useMemo(() => {
+		return getTreePoints(negativePoints, safeCanvasSize, mainRoads, housePoints);
+	}, [negativePoints, mainRoads, housePoints]);
+
 	useEffect(() => {
 		if (!safeCanvasSize || !ctxb) return;
 		if (devMode) {
@@ -92,6 +99,12 @@ function RenderMapCreator() {
 		}
 		drawBackground(ctxb, safeCanvasSize);
 	}, [ctxb, devMode, safeCanvasSize]);
+
+	useEffect(() => {
+		if (!treePoints || !ctxt) return;
+		ctxt.clearRect(0, 0, safeCanvasSize, safeCanvasSize);
+		drawTrees(ctxt, treePoints);
+	}, [ctxt, safeCanvasSize, treePoints]);
 
 	useEffect(() => {
 		if (!map) setError({ errorCode: "10", errorText: "We couldn't generate this map, sorry" });
@@ -151,7 +164,7 @@ function RenderMapCreator() {
 						roadColor,
 						roadOutlineColor
 					);
-					housePoints.forEach((p, i) => {
+					housePoints.forEach((p) => {
 						if (shadowType !== "noShadow" && shadowLength > 0) {
 							if (shadowType === "simpleShadow")
 								drawSimpleShadows(ctxs, p, spriteSettings, shadowAngle, shadowLength);
@@ -246,7 +259,7 @@ function RenderMapCreator() {
 				style={{ filter: "url(#pencil-filter-)" }}></canvas>
 			<canvas ref={layers.shadows} height={safeCanvasSize} width={safeCanvasSize}></canvas>
 			<canvas ref={layers.houses} height={safeCanvasSize} width={safeCanvasSize}></canvas>
-
+			<canvas ref={layers.trees} height={safeCanvasSize} width={safeCanvasSize}></canvas>
 			{
 				//	<div className="redGrid"></div>
 			}

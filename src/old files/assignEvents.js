@@ -9,7 +9,7 @@ inputs.forEach((element) => {
 inputs.forEach((element) => {
     const stored = localStorage.getItem(element.id);
     if (!stored) localStorage.setItem(element.id, element.value);
-    if (!!stored) element.value = stored;
+    if (stored) element.value = stored;
 });
 
 const triggers = document.querySelectorAll('.trigger');

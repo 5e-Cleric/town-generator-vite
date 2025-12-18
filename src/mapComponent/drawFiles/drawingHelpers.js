@@ -712,3 +712,11 @@ function drawBlurredSlices(ctx, polygon, shadowAngle, shadowLength) {
 		ctx.restore();
 	}
 }
+
+export function drawTrees(ctx, treePoints) {
+	if (!treePoints || treePoints.length === 0) return null;
+	treePoints.forEach(([x, y]) => {
+		ctx.fillStyle = "blue";
+		ctx.fillRect(x, y, 5, 5);
+	}); //Drawing the points
+}
