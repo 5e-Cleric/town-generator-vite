@@ -720,7 +720,6 @@ export function drawTrees(ctx, roadStep, treePoints, treeSheet) {
 	const spriteWidth = tileSize;
 	const spriteHeight = tileSize;
 	/*
-
 	ctx.save();
 	ctx.translate(x, y);
 	ctx.rotate(angle);
@@ -730,15 +729,17 @@ export function drawTrees(ctx, roadStep, treePoints, treeSheet) {
 */
 
 	//console.log(roadStep / 2);
-
 	treePoints.forEach(({ x, y, tile, angle }) => {
-		const randomTile = Math.floor(Math.random() * 2);
+		const randomTile = Math.floor(Math.random() * 3);
 
 		const yCoord = randomTile * tileSize;
 
 		const scale = 1;
-		const rectW = Math.round((roadStep / 2)) * scale;
-		const rectH = Math.round((roadStep / 2)) * scale;
+		let rectW = Math.round((roadStep / 2) * scale);
+		let rectH = Math.round((roadStep / 2) * scale);
+
+		rectW -= rectW % 2 -2;
+		rectH -= rectH % 2 -2;
 		const rectX = -rectW / 2;
 		const rectY = -rectH / 2;
 
@@ -776,7 +777,7 @@ export function drawTrees(ctx, roadStep, treePoints, treeSheet) {
 		ctx.translate(x, y);
 		ctx.rotate(angle);
 		ctx.imageSmoothingEnabled = true;
-		console.table({ x, y, tile, spriteWidth,spriteHeight, angle, xCoord, yCoord });
+		console.table({ x, y, tile, spriteWidth, spriteHeight, angle, xCoord, yCoord, rectX, rectY, rectW, rectH });
 		ctx.drawImage(
 			treeSheet, // 1️⃣ image
 			xCoord, // 2️⃣ source x

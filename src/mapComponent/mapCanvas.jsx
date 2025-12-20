@@ -153,9 +153,9 @@ function RenderMapCreator() {
 	}, [ctxs, shadowSettings]);
 
 	useEffect(() => {
-		if (!treePoints || treePoints.length > 50)
+		if (!treePoints || treePoints.length > 200)
 			setError({ errorCode: "11", errorText: "We couldn't generate the trees, sorry" });
-		if (!treePoints || treePoints.length > 200 || !ctxt || !map) return;
+		if (!treePoints || treePoints.length > 300 || !ctxt || !map) return;
 
 		if (error?.errorCode === "11") setError(null);
 		ctxt.clearRect(0, 0, safeCanvasSize, safeCanvasSize);
