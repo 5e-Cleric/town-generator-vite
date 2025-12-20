@@ -118,7 +118,6 @@ export function getTreePoints(densePoints, canvasSize, mainRoads, housePoints, r
 		const newTiledTrees = [];
 		const hasPoint = (x, y) => {
 			const found = points.some((p) => p.x === x && p.y === y);
-			console.log(`hasPoint(${x}, ${y}) →`, found);
 			return found;
 		};
 
@@ -126,7 +125,6 @@ export function getTreePoints(densePoints, canvasSize, mainRoads, housePoints, r
 
 		points.forEach((point) => {
 			const { x, y } = point;
-			console.log("Checking neighbors for:", x, y);
 
 			const neighbors = {
 				top: hasPoint(x, y - dist),
@@ -136,7 +134,7 @@ export function getTreePoints(densePoints, canvasSize, mainRoads, housePoints, r
 			};
 
 			const count = Object.values(neighbors).filter(Boolean).length;
-			console.log(count);
+			
 			let tile = "lone";
 			let angle = null;
 
@@ -162,7 +160,7 @@ export function getTreePoints(densePoints, canvasSize, mainRoads, housePoints, r
 				tile = "center";
 			}
 
-			console.log(`Has ${count} neighbors, therefore its a ${tile} tile.`)
+			
 
 			newTiledTrees.push({
 				x,
@@ -172,7 +170,6 @@ export function getTreePoints(densePoints, canvasSize, mainRoads, housePoints, r
 			});
 		});
 
-		console.log(newTiledTrees);
 		return newTiledTrees;
 	};
 

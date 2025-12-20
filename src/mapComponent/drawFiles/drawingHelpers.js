@@ -729,16 +729,16 @@ export function drawTrees(ctx, roadStep, treePoints, treeSheet) {
 	ctx.restore();
 */
 
-	console.log(roadStep / 2);
+	//console.log(roadStep / 2);
 
 	treePoints.forEach(({ x, y, tile, angle }) => {
-		const randomTile = Math.floor(Math.random() * 3);
+		const randomTile = Math.floor(Math.random() * 2);
 
 		const yCoord = randomTile * tileSize;
 
 		const scale = 1;
-		const rectW = (roadStep / 2) * scale;
-		const rectH = (roadStep / 2) * scale;
+		const rectW = Math.round((roadStep / 2)) * scale;
+		const rectH = Math.round((roadStep / 2)) * scale;
 		const rectX = -rectW / 2;
 		const rectY = -rectH / 2;
 
@@ -760,6 +760,7 @@ export function drawTrees(ctx, roadStep, treePoints, treeSheet) {
 			case "sides":
 				ctx.strokeStyle = "yellow";
 				xCoord = 3 * tileSize;
+				break;
 			case "side":
 				ctx.strokeStyle = "red";
 				xCoord = 4 * tileSize;
@@ -775,7 +776,7 @@ export function drawTrees(ctx, roadStep, treePoints, treeSheet) {
 		ctx.translate(x, y);
 		ctx.rotate(angle);
 		ctx.imageSmoothingEnabled = true;
-		console.table({ x, y, tile, angle, xCoord, yCoord });
+		console.table({ x, y, tile, spriteWidth,spriteHeight, angle, xCoord, yCoord });
 		ctx.drawImage(
 			treeSheet, // 1️⃣ image
 			xCoord, // 2️⃣ source x
@@ -787,8 +788,8 @@ export function drawTrees(ctx, roadStep, treePoints, treeSheet) {
 			rectW, // 8️⃣ destination width
 			rectH // 9️⃣ destination height
 		);
-		ctx.lineWidth = 1;
-		ctx.strokeRect(rectX, rectY, rectW, rectH);
+		//ctx.lineWidth = 1;
+		//ctx.strokeRect(rectX, rectY, rectW, rectH);
 
 		ctx.restore();
 

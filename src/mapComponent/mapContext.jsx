@@ -72,18 +72,20 @@ export const MapProvider = ({ children }) => {
 	useEffect(() => {
 		if (!settingsLoaded) return;
 
+		const treeThreshold = -0.5;
+
 		const newPoints = [];
 		for (let x = 0; x < canvasSize; x += Math.round(roadStep/2)) {
 			for (let y = 0; y < canvasSize; y += Math.round(roadStep/2)) {
 				const noiseVal = noise2D(x * noiseScale, y * noiseScale);
-				if (noiseVal > roadThreshold) {
+				if (noiseVal > treeThreshold) {
 					newPoints.push([x, y]);
 				}
 			}
 		}
 
 		setDensePoints(newPoints);
-	}, [safeCanvasSize, roadStep, noiseScale, roadThreshold, settingsLoaded]);
+	}, [safeCanvasSize, roadStep, noiseScale,  settingsLoaded]);
 
 	useEffect(() => {
 		if (!settingsLoaded) return;

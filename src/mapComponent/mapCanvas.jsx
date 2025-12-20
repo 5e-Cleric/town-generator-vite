@@ -160,7 +160,7 @@ function RenderMapCreator() {
 		if (error?.errorCode === "11") setError(null);
 		ctxt.clearRect(0, 0, safeCanvasSize, safeCanvasSize);
 		const treeSheet = new Image();
-		treeSheet.src = "assets/images/trees/tree tiles.png";
+		treeSheet.src = "assets/images/trees/tree tiles4.png";
 		treeSheet.onload = async () => {
 			try {
 				drawTrees(ctxt, roadStep, treePoints, treeSheet);
