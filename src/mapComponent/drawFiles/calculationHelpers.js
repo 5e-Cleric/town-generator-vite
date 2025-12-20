@@ -80,7 +80,6 @@ export function getTreePoints(densePoints, canvasSize, mainRoads, housePoints, r
 		[dist, dist],
 	];
 
-	// Fill initial holes based on neighbors
 	densePoints.forEach(([x, y]) => {
 		directions8.forEach(([dx, dy]) => {
 			const nx = x + dx;
@@ -95,31 +94,6 @@ export function getTreePoints(densePoints, canvasSize, mainRoads, housePoints, r
 			});
 
 			if (neighborCount >= 4) filledPoints.add(key);
-		});
-	});
-
-	// --- Step 1b: Fill points toward canvas borders ---
-	function isBorderPoint(point) {
-		const { x, y } = point;
-		return x === 0 || x === canvasSize || y === 0 || y === canvasSize;
-	}
-
-	[...filledPoints].forEach((pointKey) => {
-		const [x, y] = pointKey.split(',').map(Number);
-
-		directions8.forEach(([dx, dy]) => {
-			let nx = x;
-			let ny = y;
-
-			while (true) {
-				nx += dx;
-				ny += dy;
-				const key = `${nx},${ny}`;
-
-				if (filledPoints.has(key) || isBorderPoint({ x: nx, y: ny })) break;
-
-				filledPoints.add(key);
-			}
 		});
 	});
 
@@ -167,6 +141,10 @@ export function getTreePoints(densePoints, canvasSize, mainRoads, housePoints, r
 		if (right) return radians(180);
 		if (bottom) return radians(270);
 	};
+	function isBorderPoint(point) {
+		const { x, y } = point;
+		return x === 0 || x === canvasSize || y === 0 || y === canvasSize;
+	}
 
 	const tiledTrees = () => {
 		const points = validPoints;
@@ -211,7 +189,7 @@ export function getTreePoints(densePoints, canvasSize, mainRoads, housePoints, r
 
 			newTiledTrees.push({ x, y, tile, ...(angle !== null && { angle }) });
 		});
-
+		console.log;
 		return newTiledTrees;
 	};
 
