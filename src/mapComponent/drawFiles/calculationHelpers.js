@@ -80,6 +80,7 @@ export function getTreePoints(densePoints, canvasSize, mainRoads, housePoints, r
 		[dist, dist],
 	];
 
+	// Fill initial holes based on neighbors
 	densePoints.forEach(([x, y]) => {
 		directions8.forEach(([dx, dy]) => {
 			const nx = x + dx;
@@ -94,6 +95,56 @@ export function getTreePoints(densePoints, canvasSize, mainRoads, housePoints, r
 			});
 
 			if (neighborCount >= 4) filledPoints.add(key);
+		});
+	});
+
+	// Step 1b: Add border candidate points and fill toward canvas edges
+	const borderCandidates = [];
+
+	densePoints.forEach(([x, y]) => {
+		const dirs = [
+			[0, -dist * 2], // up
+			[dist * 2, 0], // right
+			[0, dist * 2], // down
+			[-dist * 2, 0], // left
+		];
+
+		dirs.forEach(([dx, dy]) => {
+			const nx = x + dx;
+			const ny = y + dy;
+
+			// only add if inside canvas
+			if (nx >= 0 && nx <= canvasSize && ny >= 0 && ny <= canvasSize) {
+				const key = `${nx},${ny}`;
+				if (!filledPoints.has(key)) {
+					borderCandidates.push({ x: nx, y: ny });
+					filledPoints.add(key);
+				}
+			}
+		});
+	});
+
+	// Now fill each candidate outward toward the canvas edge
+	borderCandidates.forEach(({ x, y }) => {
+		const dirs = [
+			[0, -dist], // up
+			[dist, 0], // right
+			[0, dist], // down
+			[-dist, 0], // left
+		];
+
+		dirs.forEach(([dx, dy]) => {
+			let nx = x;
+			let ny = y;
+
+			while (nx >= 0 && nx <= canvasSize && ny >= 0 && ny <= canvasSize) {
+				const key = `${nx},${ny}`;
+				if (filledPoints.has(key) || isBorderPoint({ x: nx, y: ny })) break;
+
+				filledPoints.add(key);
+				nx += dx;
+				ny += dy;
+			}
 		});
 	});
 
@@ -145,6 +196,15 @@ export function getTreePoints(densePoints, canvasSize, mainRoads, housePoints, r
 		const { x, y } = point;
 		return x === 0 || x === canvasSize || y === 0 || y === canvasSize;
 	}
+	function isCornerPoint(point) {
+		const { x, y } = point;
+		return (
+			(x === 0 && y === 0) ||
+			(x === canvasSize && y === 0) ||
+			(x === 0 && y === 0) ||
+			(x === 0 && y === canvasSize)
+		);
+	}
 
 	const tiledTrees = () => {
 		const points = validPoints;
@@ -166,15 +226,15 @@ export function getTreePoints(densePoints, canvasSize, mainRoads, housePoints, r
 			let tile = "lone";
 			let angle = null;
 
-			if (count === 4 || isBorderPoint(point)) {
-				tile = "center";
-			} else if (count === 0) {
+			if (count === 0) {
 				tile = "lone";
 			} else if (count === 1) {
 				tile = "end";
 				angle = getEndAngle(neighbors);
 			} else if (count === 2) {
 				const isOpposite = (neighbors.top && neighbors.bottom) || (neighbors.left && neighbors.right);
+
+				
 				if (isOpposite) {
 					tile = "sides";
 					angle = getSideAngle(neighbors);
@@ -182,14 +242,17 @@ export function getTreePoints(densePoints, canvasSize, mainRoads, housePoints, r
 					tile = "corner";
 					angle = getCornerAngle(neighbors);
 				}
+				if (isCornerPoint(point)) {
+					tile = "center";
+				}
 			} else if (count === 3) {
 				tile = "side";
 				angle = getSideAngle(neighbors);
-			}
+			} else if (count === 4) tile = "center";
 
 			newTiledTrees.push({ x, y, tile, ...(angle !== null && { angle }) });
 		});
-		console.log;
+
 		return newTiledTrees;
 	};
 
