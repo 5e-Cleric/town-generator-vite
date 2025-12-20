@@ -713,38 +713,93 @@ function drawBlurredSlices(ctx, polygon, shadowAngle, shadowLength) {
 	}
 }
 
-export function drawTrees(ctx, treePoints) {
+export function drawTrees(ctx, roadStep, treePoints, treeSheet) {
 	if (!treePoints || treePoints.length === 0) return null;
 
-	const radius = 15;
+	const tileSize = 64;
+	const spriteWidth = tileSize;
+	const spriteHeight = tileSize;
+	/*
+
+	ctx.save();
+	ctx.translate(x, y);
+	ctx.rotate(angle);
+	ctx.imageSmoothingEnabled = true;
+	ctx.drawImage(houseSheet, sx, sy, spriteWidth, spriteHeight, rectX, rectY, rectW, rectH);
+	ctx.restore();
+*/
+
+	console.log(roadStep / 2);
+
 	treePoints.forEach(({ x, y, tile, angle }) => {
+		const randomTile = Math.floor(Math.random() * 3);
+
+		const yCoord = randomTile * tileSize;
+
+		const scale = 1;
+		const rectW = (roadStep / 2) * scale;
+		const rectH = (roadStep / 2) * scale;
+		const rectX = -rectW / 2;
+		const rectY = -rectH / 2;
+
+		let xCoord = 0;
 		switch (tile) {
-			case "center":
-				ctx.fillStyle = "blue";
+			case "lone":
+				ctx.strokeStyle = "white";
+				angle = 0;
+				xCoord = 0;
 				break;
-			case "side":
-				ctx.fillStyle = "red";
+			case "end":
+				ctx.strokeStyle = "pink";
+				xCoord = 1 * tileSize;
 				break;
 			case "corner":
-				ctx.fillStyle = "green";
+				ctx.strokeStyle = "green";
+				xCoord = 2 * tileSize;
 				break;
-			case "lone":
-				ctx.fillStyle = "white";
+			case "sides":
+				ctx.strokeStyle = "yellow";
+				xCoord = 3 * tileSize;
+			case "side":
+				ctx.strokeStyle = "red";
+				xCoord = 4 * tileSize;
 				break;
-
+			case "center":
+				ctx.strokeStyle = "blue";
+				xCoord = 5 * tileSize;
+				break;
 			default:
 				break;
 		}
+		ctx.save();
+		ctx.translate(x, y);
+		ctx.rotate(angle);
+		ctx.imageSmoothingEnabled = true;
+		console.table({ x, y, tile, angle, xCoord, yCoord });
+		ctx.drawImage(
+			treeSheet, // 1️⃣ image
+			xCoord, // 2️⃣ source x
+			yCoord, // 3️⃣ source y
+			spriteWidth, // 4️⃣ source width
+			spriteHeight, // 5️⃣ source height
+			rectX, // 6️⃣ destination x
+			rectY, // 7️⃣ destination y
+			rectW, // 8️⃣ destination width
+			rectH // 9️⃣ destination height
+		);
+		ctx.lineWidth = 1;
+		ctx.strokeRect(rectX, rectY, rectW, rectH);
 
-		//draw tiles
-		//set range of tiles from sprite
-		//rotate on angle
+		ctx.restore();
 
+		const radius = 12;
+		/*
 		ctx.save();
 		ctx.beginPath();
 		ctx.arc(x, y, radius, 0, Math.PI * 2);
 		ctx.fill();
 		ctx.restore();
 		ctx.save();
+		*/
 	});
 }

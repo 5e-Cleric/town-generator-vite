@@ -86,21 +86,30 @@ export function getTreePoints(densePoints, canvasSize, mainRoads, housePoints, r
 		return true;
 	});
 
-	const getCornerAngle = ({ top, right, bottom, left }) => {
-		if (top && right) return 0;
-		if (right && bottom) return 90;
-		if (bottom && left) return 180;
-		if (left && top) return 270;
-	};
+	const radians = (d) => d * (Math.PI / 180);
 
 	const getSideAngle = ({ top, right, bottom, left }) => {
-		if (top && !bottom) return "top";
-		if (right && !left) return "right";
-		if (bottom && !top) return "bottom";
-		if (left && !right) return "left";
+		if (left && !right) return radians(0); // correct 0
+		if (top && !bottom) return radians(90);
+		if (right && !left) return radians(180);
+		if (bottom && !top) return radians(270);
 
-		if (left && right) return "leftRight";
-		if (top && bottom) return "topBottom";
+		if (left && right) return radians(0);
+		if (top && bottom) return radians(90);
+	};
+
+	const getCornerAngle = ({ top, right, bottom, left }) => {
+		if (left && top) return radians(0); // true 0
+		if (top && right) return radians(90);
+		if (right && bottom) return radians(180);
+		if (bottom && left) return radians(270);
+	};
+
+	const getEndAngle = ({ top, right, bottom, left }) => {
+		if (left) return radians(0); // true 0
+		if (top) return radians(90);
+		if (right) return radians(180);
+		if (bottom) return radians(270);
 	};
 
 	const tiledTrees = () => {
@@ -119,7 +128,6 @@ export function getTreePoints(densePoints, canvasSize, mainRoads, housePoints, r
 			const { x, y } = point;
 			console.log("Checking neighbors for:", x, y);
 
-
 			const neighbors = {
 				top: hasPoint(x, y - dist),
 				right: hasPoint(x + dist, y),
@@ -128,31 +136,33 @@ export function getTreePoints(densePoints, canvasSize, mainRoads, housePoints, r
 			};
 
 			const count = Object.values(neighbors).filter(Boolean).length;
-
+			console.log(count);
 			let tile = "lone";
 			let angle = null;
 
 			if (count === 0) {
 				tile = "lone";
-			} else if (count === 4) {
-				tile = "center";
-			} else if (count === 3) {
-				tile = "side";
-				angle = getSideAngle(neighbors);
+			} else if (count === 1) {
+				tile = "end";
+				angle = getEndAngle(neighbors);
 			} else if (count === 2) {
 				const isOpposite = (neighbors.top && neighbors.bottom) || (neighbors.left && neighbors.right);
 
 				if (isOpposite) {
-					tile = "side";
+					tile = "sides";
 					angle = getSideAngle(neighbors);
 				} else {
 					tile = "corner";
 					angle = getCornerAngle(neighbors);
 				}
-			} else if (count === 1) {
+			} else if (count === 3) {
 				tile = "side";
 				angle = getSideAngle(neighbors);
+			} else if (count === 4) {
+				tile = "center";
 			}
+
+			console.log(`Has ${count} neighbors, therefore its a ${tile} tile.`)
 
 			newTiledTrees.push({
 				x,

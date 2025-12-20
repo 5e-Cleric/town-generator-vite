@@ -96,7 +96,7 @@ function RenderMapCreator() {
 		if (!map) setError({ errorCode: "10", errorText: "We couldn't generate this map, sorry" });
 		if (!map || !ctxr || !ctxs || !ctxh) return;
 
-		if (error?.errorCode === "10")setError(null);
+		if (error?.errorCode === "10") setError(null);
 		const houseSheet = new Image();
 		houseSheet.src = "assets/images/roofs/spritesheet3.png";
 		houseSheet.onload = async () => {
@@ -131,7 +131,7 @@ function RenderMapCreator() {
 			}
 		};
 		houseSheet.onerror = () => {
-			console.error("Image failed to load");
+			console.error("House tiles Image failed to load");
 		};
 		//fillGrid();
 	}, [map, roadWidth, roadRadius, numSprites, spriteScale, spriteSettings, ctxh, ctxr, ctxs]);
@@ -159,7 +159,19 @@ function RenderMapCreator() {
 
 		if (error?.errorCode === "11") setError(null);
 		ctxt.clearRect(0, 0, safeCanvasSize, safeCanvasSize);
-		drawTrees(ctxt, treePoints);
+		const treeSheet = new Image();
+		treeSheet.src = "assets/images/trees/tree tiles.png";
+		treeSheet.onload = async () => {
+			try {
+				drawTrees(ctxt, roadStep, treePoints, treeSheet);
+			} catch (error) {
+				console.error(error);
+				setError(error);
+			}
+		};
+		treeSheet.onerror = () => {
+			console.error("Tree tiles Image failed to load");
+		};
 	}, [ctxt, safeCanvasSize, treePoints]);
 
 	function fillGrid() {
