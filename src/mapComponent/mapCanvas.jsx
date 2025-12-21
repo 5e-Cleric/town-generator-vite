@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo, useRef } from "react";
+import { useContext, useEffect, useMemo } from "react";
 
 import { MapContext } from "./mapContext.jsx";
 //import drawNoise from "./drawFiles/drawNoise.jsx";
@@ -18,6 +18,8 @@ function RenderMapCreator() {
 		setError,
 
 		mapSettings,
+		layers,
+
 		points,
 		densePoints,
 
@@ -26,14 +28,7 @@ function RenderMapCreator() {
 		spritesPerRow,
 	} = useContext(MapContext);
 
-	const layers = {
-		background: useRef(null),
-		roads: useRef(null),
-		shadows: useRef(null),
-		houses: useRef(null),
-		trees: useRef(null),
-		debug: useRef(null),
-	};
+
 	const ctxb = layers.background.current?.getContext("2d");
 	const ctxr = layers.roads.current?.getContext("2d");
 	const ctxs = layers.shadows.current?.getContext("2d");

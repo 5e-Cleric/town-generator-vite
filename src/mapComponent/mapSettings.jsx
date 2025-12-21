@@ -1,8 +1,10 @@
 import { useContext } from "react";
 import { MapContext } from "./mapContext.jsx";
 
+import JSZip from "jszip";
+
 function RenderMapSettings() {
-	const { mapSettings, setSettings } = useContext(MapContext);
+	const { mapSettings, setSettings, layers, safeCanvasSize } = useContext(MapContext);
 	const ROAD_STEP_MIN = 40; // densest
 	const ROAD_STEP_MAX = 100; // sparsest
 
@@ -36,6 +38,62 @@ function RenderMapSettings() {
 		}
 		return mapped;
 	}
+
+	const downloadMap = () => {
+		const refs = Object.values(layers)
+			.map((ref) => ref.current)
+			.filter(Boolean);
+
+		if (!refs.length) return;
+
+		const combined = document.createElement("canvas");
+		combined.width = safeCanvasSize;
+		combined.height = safeCanvasSize;
+
+		const ctx = combined.getContext("2d");
+
+		refs.forEach((canvas) => {
+			ctx.drawImage(canvas, 0, 0);
+		});
+
+		const link = document.createElement("a");
+		link.download = "map.png";
+		link.href = combined.toDataURL("image/png");
+		link.click();
+	};
+
+	const downloadMapAsLayers = async () => {
+		const zip = new JSZip();
+
+		const layerEntries = [
+			["background", layers.background],
+			["roads", layers.roads],
+			["houses", layers.houses],
+			["trees", layers.trees],
+		];
+
+		if (mapSettings.shadowType !== "noShadow") {
+			layerEntries.splice(2, 0, ["shadows", layers.shadows]);
+		}
+
+		for (const [name, ref] of layerEntries) {
+			const canvas = ref.current;
+			if (!canvas) continue;
+
+			const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+
+			zip.file(`${name}.png`, blob);
+		}
+
+		const zipBlob = await zip.generateAsync({ type: "blob" });
+
+		const link = document.createElement("a");
+		link.href = URL.createObjectURL(zipBlob);
+		link.download = "map.zip";
+		link.click();
+
+		URL.revokeObjectURL(link.href);
+	};
 
 	return (
 		<aside className="sidebar">
@@ -220,6 +278,10 @@ function RenderMapSettings() {
 					</label>
 				</details>
 			</form>
+			<div className="downloads">
+				<button onClick={downloadMap}>Download Map</button>
+				<button onClick={downloadMapAsLayers}>Download Map as layers</button>
+			</div>
 		</aside>
 	);
 }

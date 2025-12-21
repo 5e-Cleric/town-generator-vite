@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useRef } from "react";
 import { createNoise2D } from "simplex-noise";
 
 export const MapContext = createContext();
@@ -27,6 +27,15 @@ export const MapProvider = ({ children }) => {
 		treeStep: 60,
 		treeDistance: 60,
 	});
+
+	const layers = {
+		background: useRef(null),
+		roads: useRef(null),
+		shadows: useRef(null),
+		houses: useRef(null),
+		trees: useRef(null),
+		debug: useRef(null),
+	};
 
 	//settings that warrant a recalculation of the road structure
 	const { canvasSize, roadStep, noiseScale, roadThreshold, treeStep } = mapSettings;
@@ -123,6 +132,8 @@ export const MapProvider = ({ children }) => {
 				setError,
 				mapSettings,
 				setSettings,
+				safeCanvasSize,
+				layers,
 
 				points,
 				densePoints,
