@@ -1,12 +1,7 @@
-import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import "./App.css";
 
-import RenderMapAssets from "./mapComponent/mapAssets";
-import RenderMapCreator from "./mapComponent/mapCanvas";
-import RenderMapSettings from "./mapComponent/mapSettings";
-import MapProvider from "./mapComponent/mapContext";
-
+import CreatePage from "./pages/createPage.jsx";
 import NaturalcritLogo from "../assets/svg/NaturalcritLogo.jsx";
 
 const user = "";
@@ -19,17 +14,6 @@ function renderLoginButton() {
 	}
 }
 
-// Separate MapPage component to wrap with MapProvider
-function MapPage() {
-	return (
-		<MapProvider>
-			<RenderMapSettings />
-			<RenderMapCreator />
-			{/* <RenderMapAssets /> */}
-		</MapProvider>
-	);
-}
-
 function App() {
 	return (
 		<Router basename="/town-generator-vite">
@@ -40,8 +24,8 @@ function App() {
 			<main>
 				<Routes>
 					<Route path="/" element={<Navigate to="/create" />} />
-					<Route path="/create" element={<MapPage />} />
-					<Route path="/maps" element={<MapPage />} />
+					<Route path="/create" element={<CreatePage />} />
+					<Route path="/maps" element={<CreatePage />} />
 				</Routes>
 			</main>
 		</Router>
