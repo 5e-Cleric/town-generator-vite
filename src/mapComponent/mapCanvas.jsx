@@ -93,6 +93,7 @@ function RenderMapCreator() {
 		drawBackground(ctxb, safeCanvasSize);
 	}, [ctxb, safeCanvasSize]);
 
+	//Drawing the entire map
 	useEffect(() => {
 		if (!map) setError({ errorCode: "10", errorText: "We couldn't generate this map, sorry" });
 		if (!map || !ctxr || !ctxs || !ctxh) return;
@@ -133,10 +134,10 @@ function RenderMapCreator() {
 		};
 		houseSheet.onerror = () => {
 			console.error("House tiles Image failed to load");
-		};
-		//fillGrid();
+		}
 	}, [map, numSprites, spriteScale, spriteSettings, ctxh, ctxr, ctxs]);
 
+	//redrawing just the roads
 	useEffect(() => {
 		if (!map) setError({ errorCode: "10", errorText: "We couldn't generate this map, sorry" });
 		if (!map || !ctxr || !ctxs || !ctxh) return;
@@ -186,6 +187,7 @@ function RenderMapCreator() {
 		});
 	}, [ctxs, shadowSettings]);
 
+	//drawing the trees
 	useEffect(() => {
 		if (!treePoints || treePoints.length > 200)
 			setError({ errorCode: "11", errorText: "We couldn't generate the trees, sorry" });
@@ -221,7 +223,7 @@ function RenderMapCreator() {
 					<feDisplacementMap
 						in="SourceGraphic"
 						in2="noise"
-						scale="5"
+						scale="3"
 						xChannelSelector="R"
 						yChannelSelector="G"
 					/>
