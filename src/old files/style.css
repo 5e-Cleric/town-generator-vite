@@ -158,14 +158,6 @@ body {
 			}
 		}
 	}
-
-	.redGrid {
-		color: #9900ff00;
-		position: absolute;
-		inset: 0;
-		background: repeating-linear-gradient(90deg, currentColor 0px, currentColor 1px, transparent 0px, transparent 39px, currentColor 39px, currentColor 40px),
-			repeating-linear-gradient(0deg, currentColor 0px, currentColor 1px, transparent 0px, transparent 39px, currentColor 39px, currentColor 40px);
-	}
 }
 
 input, select {

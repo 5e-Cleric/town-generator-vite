@@ -165,7 +165,6 @@ function RenderMapCreator() {
 		houseSheet.onerror = () => {
 			console.error("House tiles Image failed to load");
 		};
-		//fillGrid();
 	}, [roadWidth, roadRadius]);
 
 	//redraw shadows
@@ -209,35 +208,6 @@ function RenderMapCreator() {
 		};
 	}, [ctxt, safeCanvasSize, treePoints, treeStep]);
 
-	function fillGrid() {
-		const xLabels = document.querySelector(".grid .xLabels");
-		const yLabels = document.querySelector(".grid .yLabels");
-		const width = safeCanvasSize;
-		const height = safeCanvasSize;
-		const step = 100;
-
-		xLabels.innerHTML = "";
-		yLabels.innerHTML = "";
-
-		for (let x = 0; x <= width; x += step) {
-			const labelX = document.createElement("div");
-			labelX.className = "labelX";
-			labelX.textContent = x;
-			labelX.style.left = `${x}px`;
-			labelX.style.transform = "translateX(-50%)";
-			xLabels.appendChild(labelX);
-		}
-
-		for (let y = 0; y <= height; y += step) {
-			const labelY = document.createElement("div");
-			labelY.className = "labelY";
-			labelY.textContent = y;
-			labelY.style.top = `${y}px`;
-			labelY.style.transform = "translateY(-50%)";
-			yLabels.appendChild(labelY);
-		}
-	}
-
 	return (
 		<div className="canvasHolder" style={{ height: safeCanvasSize, width: safeCanvasSize }}>
 			<div className="grid">
@@ -267,9 +237,6 @@ function RenderMapCreator() {
 			<canvas ref={layers.shadows} height={safeCanvasSize} width={safeCanvasSize}></canvas>
 			<canvas ref={layers.houses} height={safeCanvasSize} width={safeCanvasSize}></canvas>
 			<canvas ref={layers.trees} height={safeCanvasSize} width={safeCanvasSize}></canvas>
-			{
-				//	<div className="redGrid"></div>
-			}
 		</div>
 	);
 }
