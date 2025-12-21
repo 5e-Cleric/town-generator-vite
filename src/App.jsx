@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import "./App.css";
 
 import CreatePage from "./pages/createPage.jsx";
-import NaturalcritLogo from "../assets/svg/NaturalcritLogo.jsx";
+import NaturalcritLogo from "./assets/NaturalcritLogo.jsx";
 
 const user = "";
 
