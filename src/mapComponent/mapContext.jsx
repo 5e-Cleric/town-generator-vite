@@ -25,6 +25,7 @@ export const MapProvider = ({ children }) => {
 		shadowAngle: 2,
 		shadowLength: 18,
 		treeStep: 60,
+		treeDistance: 60,
 	});
 
 	//settings that warrant a recalculation of the road structure
@@ -50,6 +51,7 @@ export const MapProvider = ({ children }) => {
 			shadowLength: parseFloat(localStorage.getItem("shadowLength")) || prev.shadowLength,
 			numSprites: prev.numSprites,
 			treeStep: parseInt(localStorage.getItem("treeDensity")) || prev.treeStep,
+			treeDistance: parseInt(localStorage.getItem("treeDistance")) || prev.treeDistance,
 		}));
 
 		setSettingsLoaded(true);
@@ -101,6 +103,7 @@ export const MapProvider = ({ children }) => {
 		localStorage.setItem("shadowAngle", mapSettings.shadowAngle);
 		localStorage.setItem("shadowLength", mapSettings.shadowLength);
 		localStorage.setItem("treeDensity", mapSettings.treeStep);
+		localStorage.setItem("treeDistance", mapSettings.treeDistance);
 	}, [mapSettings, settingsLoaded]);
 
 	function renderError() {

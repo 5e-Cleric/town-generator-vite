@@ -4,12 +4,13 @@ import { MapContext } from "./mapContext.jsx";
 function RenderMapSettings() {
 	const { mapSettings, setSettings } = useContext(MapContext);
 
-	const roadStepMaximum = 200;
+	const ROAD_STEP_MIN = 10; // densest
+	const ROAD_STEP_MAX = 70; // sparsest
 
 	function handleChange(e) {
 		const { id, name, value, type } = e.target;
 
-		// Radios: use name, raw value
+		// Radios
 		if (type === "radio") {
 			setSettings((prev) => ({
 				...prev,
@@ -18,8 +19,7 @@ function RenderMapSettings() {
 			return;
 		}
 
-		// Existing numeric + special case handling
-		const newValue = id === "roadStep" ? roadStepMaximum - Number(value) : isNaN(value) ? value : Number(value);
+		const newValue = id === "roadStep" ? ROAD_STEP_MAX + ROAD_STEP_MIN - Number(value) : Number(value);
 
 		setSettings((prev) => ({
 			...prev,
@@ -38,17 +38,18 @@ function RenderMapSettings() {
 						<input type="number" id="canvasSize" value={mapSettings.canvasSize} onChange={handleChange} />
 					</label>
 				</fieldset>
+
 				<details>
 					<summary>Main Roads</summary>
 					<label>
-						<p>Road Density:</p>
+						<p>Road Density</p>
 						<input
 							type="range"
 							id="roadStep"
-							min="40"
-							max={roadStepMaximum.toString()}
+							min={ROAD_STEP_MIN}
+							max={ROAD_STEP_MAX}
 							step="5"
-							value={roadStepMaximum - mapSettings.roadStep}
+							value={ROAD_STEP_MAX + ROAD_STEP_MIN - mapSettings.roadStep}
 							onChange={handleChange}
 						/>
 					</label>
@@ -143,7 +144,7 @@ function RenderMapSettings() {
 							unit="rad"
 							onChange={handleChange}
 							disabled={mapSettings.shadowType === "noShadow"}
-							title={mapSettings.shadowType === "noShadow" ? 'There is no shadow type selected.' : ''}
+							title={mapSettings.shadowType === "noShadow" ? "There is no shadow type selected." : ""}
 						/>
 					</label>
 					<label>
@@ -159,7 +160,7 @@ function RenderMapSettings() {
 							unit="px"
 							onChange={handleChange}
 							disabled={mapSettings.shadowType === "noShadow"}
-							title={mapSettings.shadowType === "noShadow" ? 'There is no shadow type selected.' : ''}
+							title={mapSettings.shadowType === "noShadow" ? "There is no shadow type selected." : ""}
 						/>
 						<small>Note: shadow blurriness depends on the length.</small>
 					</label>
@@ -176,6 +177,20 @@ function RenderMapSettings() {
 							step="5"
 							value={mapSettings.treeStep}
 							displayedvalue={Math.round(mapSettings.treeStep)}
+							unit="px"
+							onChange={handleChange}
+						/>
+					</label>
+					<label>
+						<p>Distance from forest to town</p>
+						<input
+							type="range"
+							id="treeDistance"
+							min="0"
+							max="100"
+							step="5"
+							value={mapSettings.treeDistance}
+							displayedvalue={Math.round(mapSettings.treeDistance)}
 							unit="px"
 							onChange={handleChange}
 						/>

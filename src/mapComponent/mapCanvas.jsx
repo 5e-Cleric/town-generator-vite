@@ -32,12 +32,14 @@ function RenderMapCreator() {
 		shadows: useRef(null),
 		houses: useRef(null),
 		trees: useRef(null),
+		debug: useRef(null),
 	};
 	const ctxb = layers.background.current?.getContext("2d");
 	const ctxr = layers.roads.current?.getContext("2d");
 	const ctxs = layers.shadows.current?.getContext("2d");
 	const ctxh = layers.houses.current?.getContext("2d");
 	const ctxt = layers.trees.current?.getContext("2d");
+	const ctxd = layers.debug.current?.getContext("2d");
 
 	const {
 		canvasSize,
@@ -50,6 +52,7 @@ function RenderMapCreator() {
 		shadowAngle,
 		shadowLength,
 		treeStep,
+		treeDistance,
 	} = mapSettings;
 
 	const spriteSettings = useMemo(
@@ -84,9 +87,19 @@ function RenderMapCreator() {
 	const housePoints = map?.housePoints;
 	const accessRoads = map?.accessRoads;
 
+	const steppedRoadWidth = useMemo(() => Math.round(roadWidth / 10) * 10, [roadWidth]);
 	const treePoints = useMemo(() => {
-		return getTreePoints(densePoints, safeCanvasSize, mainRoads, housePoints, treeStep);
-	}, [densePoints, mainRoads, housePoints]);
+		return getTreePoints(
+			densePoints,
+			safeCanvasSize,
+			mainRoads,
+			housePoints,
+			treeStep,
+			treeDistance,
+			spriteScale,
+			steppedRoadWidth
+		);
+	}, [densePoints, mainRoads, housePoints, treeDistance, steppedRoadWidth, spriteScale]);
 
 	useEffect(() => {
 		if (!safeCanvasSize || !ctxb) return;
@@ -99,6 +112,14 @@ function RenderMapCreator() {
 		if (!map || !ctxr || !ctxs || !ctxh) return;
 
 		if (error?.errorCode === "10") setError(null);
+		ctxd.clearRect(0, 0, safeCanvasSize, safeCanvasSize);
+		points.forEach((p) => {
+			ctxd.save();
+			ctxd.fillStyle = "red";
+			ctxd.fillRect(p[0], p[1], 5, 5);
+			ctxd.restore();
+		});
+
 		const houseSheet = new Image();
 		houseSheet.src = "assets/images/roofs/spritesheet3.png";
 		houseSheet.onload = async () => {
@@ -134,7 +155,7 @@ function RenderMapCreator() {
 		};
 		houseSheet.onerror = () => {
 			console.error("House tiles Image failed to load");
-		}
+		};
 	}, [map, numSprites, spriteScale, spriteSettings, ctxh, ctxr, ctxs]);
 
 	//redrawing just the roads
@@ -239,6 +260,7 @@ function RenderMapCreator() {
 			<canvas ref={layers.shadows} height={safeCanvasSize} width={safeCanvasSize}></canvas>
 			<canvas ref={layers.houses} height={safeCanvasSize} width={safeCanvasSize}></canvas>
 			<canvas ref={layers.trees} height={safeCanvasSize} width={safeCanvasSize}></canvas>
+			<canvas ref={layers.debug} height={safeCanvasSize} width={safeCanvasSize}></canvas>
 		</div>
 	);
 }

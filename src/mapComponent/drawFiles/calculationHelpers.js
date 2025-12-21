@@ -194,7 +194,7 @@ export function makeMap(points, canvasSize, roadStep, numSprites, spriteScale, s
 	if (!points || points.length === 0) return null;
 	if (points.length > 500) return null;
 
-	const minDistanceFromEdge = roadStep + roadStep * 1.5;
+	const minDistanceFromEdge = roadStep * 4;
 	const filteredPoints = points.filter(
 		([x, y]) =>
 			x > minDistanceFromEdge &&
@@ -228,11 +228,12 @@ export function makeMap(points, canvasSize, roadStep, numSprites, spriteScale, s
 	};
 }
 
-export function getTreePoints(densePoints, canvasSize, mainRoads, housePoints, treeStep) {
+export function getTreePoints(densePoints, canvasSize, mainRoads, housePoints, treeStep, treeDistance, spriteScale, roadWidth) {
 	if (!densePoints || densePoints.length === 0) return null;
 
 	const dist = treeStep;
-	const minDistSq = 60 ** 2;
+	const minDistSqRoads = (treeDistance + roadWidth) ** 2;
+	const minDistSqHouses = (treeDistance *spriteScale + 30) ** 2
 
 	const distSq = (a, b) => {
 		const ax = a[0],
@@ -346,13 +347,13 @@ export function getTreePoints(densePoints, canvasSize, mainRoads, housePoints, t
 	// --- Step 2: Remove points too close to houses or main roads ---
 	const validPoints = filledPointArray.filter((p) => {
 		for (const h of housePoints || []) {
-			if (distSq([p.x, p.y], h) < minDistSq) return false;
+			if (distSq([p.x, p.y], h) < minDistSqHouses) return false;
 		}
 
 		for (const road of mainRoads || []) {
 			const a = { x: road.from[0], y: road.from[1] };
 			const b = { x: road.to[0], y: road.to[1] };
-			if (pointToSegmentDistSq([p.x, p.y], a, b) < minDistSq) return false;
+			if (pointToSegmentDistSq([p.x, p.y], a, b) < minDistSqRoads) return false;
 		}
 
 		return true;
