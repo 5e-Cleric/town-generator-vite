@@ -213,7 +213,7 @@ function RenderMapCreator() {
 
 	//drawing the trees
 	useEffect(() => {
-		if (!treePoints || treePoints.length > 200)
+		if (!treePoints || treePoints.length > 300)
 			setError({ errorCode: "11", errorText: "We couldn't generate the trees, sorry" });
 		if (!treePoints || treePoints.length > 300 || !ctxt || !map) return;
 

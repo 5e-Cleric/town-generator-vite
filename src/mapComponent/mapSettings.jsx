@@ -40,7 +40,7 @@ function RenderMapSettings() {
 					<h3>General settings</h3>
 					<label>
 						<p>Canvas Size:</p>
-						<input type="number" id="canvasSize" value={mapSettings.canvasSize} onChange={handleChange} />
+						<input type="number" id="canvasSize" value={mapSettings.canvasSize} step={10} onChange={handleChange} />
 					</label>
 				</fieldset>
 
