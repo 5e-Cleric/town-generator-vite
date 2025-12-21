@@ -24,10 +24,11 @@ export const MapProvider = ({ children }) => {
 		shadowType: "simpleShadows",
 		shadowAngle: 2,
 		shadowLength: 18,
+		treeStep: 60,
 	});
 
 	//settings that warrant a recalculation of the road structure
-	const { canvasSize, roadStep, noiseScale, roadThreshold } = mapSettings;
+	const { canvasSize, roadStep, noiseScale, roadThreshold, treeStep } = mapSettings;
 
 	const safeCanvasSize = Math.min(Math.max(canvasSize, 100), 800);
 
@@ -48,6 +49,7 @@ export const MapProvider = ({ children }) => {
 			shadowAngle: parseFloat(localStorage.getItem("shadowAngle")) || prev.shadowAngle,
 			shadowLength: parseFloat(localStorage.getItem("shadowLength")) || prev.shadowLength,
 			numSprites: prev.numSprites,
+			treeStep: parseInt(localStorage.getItem("treeDensity")) || prev.treeStep,
 		}));
 
 		setSettingsLoaded(true);
@@ -75,8 +77,8 @@ export const MapProvider = ({ children }) => {
 		const treeThreshold = -0.5;
 
 		const newPoints = [];
-		for (let x = 0; x < canvasSize; x += Math.round(roadStep/2)) {
-			for (let y = 0; y < canvasSize; y += Math.round(roadStep/2)) {
+		for (let x = 0; x < canvasSize; x += treeStep) {
+			for (let y = 0; y < canvasSize; y += treeStep) {
 				const noiseVal = noise2D(x * noiseScale, y * noiseScale);
 				if (noiseVal > treeThreshold) {
 					newPoints.push([x, y]);
@@ -85,7 +87,7 @@ export const MapProvider = ({ children }) => {
 		}
 
 		setDensePoints(newPoints);
-	}, [safeCanvasSize, roadStep, noiseScale,  settingsLoaded]);
+	}, [safeCanvasSize, treeStep, noiseScale, settingsLoaded]);
 
 	useEffect(() => {
 		if (!settingsLoaded) return;
@@ -98,6 +100,7 @@ export const MapProvider = ({ children }) => {
 		localStorage.setItem("shadowType", mapSettings.shadowType);
 		localStorage.setItem("shadowAngle", mapSettings.shadowAngle);
 		localStorage.setItem("shadowLength", mapSettings.shadowLength);
+		localStorage.setItem("treeDensity", mapSettings.treeStep);
 	}, [mapSettings, settingsLoaded]);
 
 	function renderError() {

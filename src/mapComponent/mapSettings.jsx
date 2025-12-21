@@ -142,6 +142,8 @@ function RenderMapSettings() {
 							value={mapSettings.shadowAngle}
 							unit="rad"
 							onChange={handleChange}
+							disabled={mapSettings.shadowType === "noShadow"}
+							title={mapSettings.shadowType === "noShadow" ? 'There is no shadow type selected.' : ''}
 						/>
 					</label>
 					<label>
@@ -156,8 +158,27 @@ function RenderMapSettings() {
 							displayedvalue={Math.round(mapSettings.spriteScale * 10 * mapSettings.shadowLength)}
 							unit="px"
 							onChange={handleChange}
+							disabled={mapSettings.shadowType === "noShadow"}
+							title={mapSettings.shadowType === "noShadow" ? 'There is no shadow type selected.' : ''}
 						/>
 						<small>Note: shadow blurriness depends on the length.</small>
+					</label>
+				</details>
+				<details>
+					<summary>Forests</summary>
+					<label>
+						<p>Forest size</p>
+						<input
+							type="range"
+							id="treeStep"
+							min="20"
+							max="100"
+							step="5"
+							value={mapSettings.treeStep}
+							displayedvalue={Math.round(mapSettings.treeStep)}
+							unit="px"
+							onChange={handleChange}
+						/>
 					</label>
 				</details>
 			</form>

@@ -49,6 +49,7 @@ function RenderMapCreator() {
 		shadowType,
 		shadowAngle,
 		shadowLength,
+		treeStep,
 	} = mapSettings;
 
 	const spriteSettings = useMemo(
@@ -77,14 +78,14 @@ function RenderMapCreator() {
 
 	const map = useMemo(() => {
 		return makeMap(points, safeCanvasSize, roadStep, numSprites, spriteScale, spriteHeight);
-	}, [points, roadStep, numSprites, spriteScale, spriteHeight]);
+	}, [points, numSprites, spriteScale, spriteHeight]);
 
 	const mainRoads = map?.mainRoads;
 	const housePoints = map?.housePoints;
 	const accessRoads = map?.accessRoads;
 
 	const treePoints = useMemo(() => {
-		return getTreePoints(densePoints, safeCanvasSize, mainRoads, housePoints, roadStep);
+		return getTreePoints(densePoints, safeCanvasSize, mainRoads, housePoints, treeStep);
 	}, [densePoints, mainRoads, housePoints]);
 
 	useEffect(() => {
@@ -134,13 +135,47 @@ function RenderMapCreator() {
 			console.error("House tiles Image failed to load");
 		};
 		//fillGrid();
-	}, [map, roadWidth, roadRadius, numSprites, spriteScale, spriteSettings, ctxh, ctxr, ctxs]);
+	}, [map, numSprites, spriteScale, spriteSettings, ctxh, ctxr, ctxs]);
 
 	useEffect(() => {
-		//redraw shadows
+		if (!map) setError({ errorCode: "10", errorText: "We couldn't generate this map, sorry" });
+		if (!map || !ctxr || !ctxs || !ctxh) return;
+
+		if (error?.errorCode === "10") setError(null);
+		const houseSheet = new Image();
+		houseSheet.src = "assets/images/roofs/spritesheet3.png";
+		houseSheet.onload = async () => {
+			try {
+				ctxr.clearRect(0, 0, safeCanvasSize, safeCanvasSize);
+				drawMainRoads(
+					ctxr,
+					mainRoads,
+					accessRoads,
+					roadWidth,
+					roadRadius,
+					safeCanvasSize,
+					roadColor,
+					roadOutlineColor
+				);
+			} catch (error) {
+				console.error(error);
+				setError(error);
+			}
+		};
+		houseSheet.onerror = () => {
+			console.error("House tiles Image failed to load");
+		};
+		//fillGrid();
+	}, [roadWidth, roadRadius]);
+
+	//redraw shadows
+	useEffect(() => {
 		if (!points || points.length === 0 || !map) return;
 		if (!mapSettings) return;
-		if (shadowType === "noShadow") return;
+		if (shadowType === "noShadow") {
+			ctxs.clearRect(0, 0, safeCanvasSize, safeCanvasSize);
+			return;
+		}
 		ctxs.clearRect(0, 0, safeCanvasSize, safeCanvasSize);
 		housePoints.forEach((p, i) => {
 			if (shadowType !== "noShadow" && shadowLength > 0) {
@@ -163,7 +198,7 @@ function RenderMapCreator() {
 		treeSheet.src = "assets/images/trees/tree tiles4.png";
 		treeSheet.onload = async () => {
 			try {
-				drawTrees(ctxt, roadStep, treePoints, treeSheet);
+				drawTrees(ctxt, treeStep, treePoints, treeSheet);
 			} catch (error) {
 				console.error(error);
 				setError(error);
@@ -172,7 +207,7 @@ function RenderMapCreator() {
 		treeSheet.onerror = () => {
 			console.error("Tree tiles Image failed to load");
 		};
-	}, [ctxt, safeCanvasSize, treePoints]);
+	}, [ctxt, safeCanvasSize, treePoints, treeStep]);
 
 	function fillGrid() {
 		const xLabels = document.querySelector(".grid .xLabels");

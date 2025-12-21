@@ -140,13 +140,17 @@ body {
 						&::after {
 							content: attr(unit);
 							position: absolute;
-							right: -15px;
+							right: -20px;
 							top: 50%;
 							translate: calc(100% + 5ch) -50%;
 							width: fit-content;
 							height: 1em;
 							color: #ccc;
 							padding: 2px 5px;
+						}
+
+						&:disabled::before,&:disabled::after {
+							color:#999;
 						}
 					}
 
