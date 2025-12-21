@@ -5,10 +5,12 @@ function RenderMapSettings() {
 	const { mapSettings, setSettings } = useContext(MapContext);
 	const ROAD_STEP_MIN = 40; // densest
 	const ROAD_STEP_MAX = 100; // sparsest
-	const ROAD_STEP_RANGE = ROAD_STEP_MAX - ROAD_STEP_MIN;
 
 	function handleChange(e) {
-		const { id, name, value, type } = e.target;
+		const { id, name, value, type, min, max, dataset } = e.target;
+		const mapMin = Number(dataset.mapMin);
+		const mapMax = Number(dataset.mapMax);
+		const reverse = dataset.reverse === "true"; // dataset values are strings
 
 		// Radios
 		if (type === "radio") {
@@ -19,17 +21,20 @@ function RenderMapSettings() {
 			return;
 		}
 
-		let newValue = Number(value);
-
-		if (id === "roadStep") {
-			// Map 0-100 slider inversely to ROAD_STEP_MIN - ROAD_STEP_MAX
-			newValue = ROAD_STEP_MAX - ROAD_STEP_RANGE * (Number(value) / 100);
-		}
+		const newValue = mapMin && mapMax ? mapValue(value, min, max, mapMin, mapMax, reverse) : Number(value);
 
 		setSettings((prev) => ({
 			...prev,
 			[id]: newValue,
 		}));
+	}
+
+	function mapValue(value, inMin, inMax, outMin, outMax, reverse = false) {
+		let mapped = outMin + ((value - inMin) * (outMax - outMin)) / (inMax - inMin);
+		if (reverse) {
+			mapped = outMax - (mapped - outMin);
+		}
+		return mapped;
 	}
 
 	return (
@@ -40,7 +45,13 @@ function RenderMapSettings() {
 					<h3>General settings</h3>
 					<label>
 						<p>Canvas Size:</p>
-						<input type="number" id="canvasSize" value={mapSettings.canvasSize} step={10} onChange={handleChange} />
+						<input
+							type="number"
+							id="canvasSize"
+							value={mapSettings.canvasSize}
+							step={10}
+							onChange={handleChange}
+						/>
 					</label>
 				</fieldset>
 
@@ -54,7 +65,10 @@ function RenderMapSettings() {
 							min="0"
 							max="100"
 							step="10"
-							value={Math.round(((ROAD_STEP_MAX - mapSettings.roadStep) / ROAD_STEP_RANGE) * 100)}
+							value={mapValue(mapSettings.roadStep, 40, 100, 0, 100, true)}
+							data-map-min={40}
+							data-map-max={100}
+							data-reverse={true}
 							onChange={handleChange}
 						/>
 					</label>
@@ -169,7 +183,7 @@ function RenderMapSettings() {
 							unit="px"
 							onChange={handleChange}
 							disabled={mapSettings.shadowType === "noShadow"}
-							title={mapSettings.shadowType === "noShadow" ? "There is no shadow type selected." : ""}
+							title={mapSettings.shadowType === "noShadow" ? "There is no shadow." : ""}
 						/>
 						<small>Note: shadow blurriness depends on the length.</small>
 					</label>
@@ -181,12 +195,12 @@ function RenderMapSettings() {
 						<input
 							type="range"
 							id="treeStep"
-							min="40"
-							max="65"
-							step="5"
-							value={mapSettings.treeStep}
-							displayedvalue={Math.round(mapSettings.treeStep)}
-							unit="px"
+							min="0"
+							max="100"
+							step="10"
+							value={mapValue(mapSettings.treeStep, 40, 65, 0, 100)}
+							data-map-min="40"
+							data-map-max="65"
 							onChange={handleChange}
 						/>
 					</label>
