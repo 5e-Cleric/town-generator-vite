@@ -59,13 +59,13 @@ body {
 			overflow-y: auto;
 
 			/*
-			background: url('/images/textures/scroll.png');
+			background: url('/assets/images/textures/scroll.png');
 			&::after {
 				position: absolute;
 				inset: 5px;
 				content: '';
 				border: 15px solid;
-				border-image: url('/images/textures/redscroll.jpg') 30;
+				border-image: url('/assets/images/textures/redscroll.jpg') 30;
 				pointer-events: none;
 			}
 			*/
@@ -148,8 +148,9 @@ body {
 							padding: 2px 5px;
 						}
 
-						&:disabled::before,&:disabled::after {
-							color:#999;
+						&:disabled::before,
+						&:disabled::after {
+							color: #999;
 						}
 					}
 
@@ -307,14 +308,14 @@ body {
 		}
 
 		> .error {
-			position:absolute;
-			top:0;
-			left:50%;
-			translate:-50% 0;
-			padding:4px 10px;
-			border:2px solid #ccc;
-			border-top:none;
-			background:rgb(206, 79, 79);
+			position: absolute;
+			top: 0;
+			left: 50%;
+			translate: -50% 0;
+			padding: 4px 10px;
+			border: 2px solid #ccc;
+			border-top: none;
+			background: rgb(206, 79, 79);
 			border-bottom-left-radius: 10px;
 			border-bottom-right-radius: 10px;
 		}
@@ -324,7 +325,7 @@ body {
 input,
 select {
 	border-radius: 5px;
-	background: #fff9ec;
+	background: #ececec;
 	height: 2em;
 	outline: 0;
 	border: 2px solid;
