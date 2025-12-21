@@ -3,9 +3,9 @@ import { MapContext } from "./mapContext.jsx";
 
 function RenderMapSettings() {
 	const { mapSettings, setSettings } = useContext(MapContext);
-
-	const ROAD_STEP_MIN = 10; // densest
-	const ROAD_STEP_MAX = 70; // sparsest
+	const ROAD_STEP_MIN = 40; // densest
+	const ROAD_STEP_MAX = 100; // sparsest
+	const ROAD_STEP_RANGE = ROAD_STEP_MAX - ROAD_STEP_MIN;
 
 	function handleChange(e) {
 		const { id, name, value, type } = e.target;
@@ -19,7 +19,12 @@ function RenderMapSettings() {
 			return;
 		}
 
-		const newValue = id === "roadStep" ? ROAD_STEP_MAX + ROAD_STEP_MIN - Number(value) : Number(value);
+		let newValue = Number(value);
+
+		if (id === "roadStep") {
+			// Map 0-100 slider inversely to ROAD_STEP_MIN - ROAD_STEP_MAX
+			newValue = ROAD_STEP_MAX - ROAD_STEP_RANGE * (Number(value) / 100);
+		}
 
 		setSettings((prev) => ({
 			...prev,
@@ -46,10 +51,10 @@ function RenderMapSettings() {
 						<input
 							type="range"
 							id="roadStep"
-							min={ROAD_STEP_MIN}
-							max={ROAD_STEP_MAX}
-							step="5"
-							value={ROAD_STEP_MAX + ROAD_STEP_MIN - mapSettings.roadStep}
+							min="0"
+							max="100"
+							step="10"
+							value={Math.round(((ROAD_STEP_MAX - mapSettings.roadStep) / ROAD_STEP_RANGE) * 100)}
 							onChange={handleChange}
 						/>
 					</label>
@@ -143,8 +148,12 @@ function RenderMapSettings() {
 							value={mapSettings.shadowAngle}
 							unit="rad"
 							onChange={handleChange}
-							disabled={mapSettings.shadowType === "noShadow"}
-							title={mapSettings.shadowType === "noShadow" ? "There is no shadow type selected." : ""}
+							disabled={mapSettings.shadowType === "noShadow" || mapSettings.shadowLength < 1}
+							title={
+								mapSettings.shadowType === "noShadow" || mapSettings.shadowLength < 1
+									? "There is no shadow."
+									: ""
+							}
 						/>
 					</label>
 					<label>
@@ -172,8 +181,8 @@ function RenderMapSettings() {
 						<input
 							type="range"
 							id="treeStep"
-							min="20"
-							max="100"
+							min="40"
+							max="65"
 							step="5"
 							value={mapSettings.treeStep}
 							displayedvalue={Math.round(mapSettings.treeStep)}

@@ -112,6 +112,9 @@ function RenderMapCreator() {
 		if (!map || !ctxr || !ctxs || !ctxh) return;
 
 		if (error?.errorCode === "10") setError(null);
+
+		/*
+		//debug points
 		ctxd.clearRect(0, 0, safeCanvasSize, safeCanvasSize);
 		points.forEach((p) => {
 			ctxd.save();
@@ -119,7 +122,7 @@ function RenderMapCreator() {
 			ctxd.fillRect(p[0], p[1], 5, 5);
 			ctxd.restore();
 		});
-
+		*/
 		const houseSheet = new Image();
 		houseSheet.src = "assets/images/roofs/spritesheet3.png";
 		houseSheet.onload = async () => {
@@ -215,11 +218,12 @@ function RenderMapCreator() {
 		if (!treePoints || treePoints.length > 300 || !ctxt || !map) return;
 
 		if (error?.errorCode === "11") setError(null);
-		ctxt.clearRect(0, 0, safeCanvasSize, safeCanvasSize);
+		
 		const treeSheet = new Image();
 		treeSheet.src = "assets/images/trees/tree tiles4.png";
 		treeSheet.onload = async () => {
 			try {
+				ctxt.clearRect(0, 0, safeCanvasSize, safeCanvasSize);
 				drawTrees(ctxt, treeStep, treePoints, treeSheet);
 			} catch (error) {
 				console.error(error);

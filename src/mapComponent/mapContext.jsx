@@ -61,8 +61,8 @@ export const MapProvider = ({ children }) => {
 		if (!settingsLoaded) return;
 
 		const newPoints = [];
-		for (let x = 0; x < canvasSize; x += roadStep) {
-			for (let y = 0; y < canvasSize; y += roadStep) {
+		for (let x = 0; x < canvasSize; x += Math.min(60, Math.max(roadStep, 30))) {
+			for (let y = 0; y < canvasSize; y += Math.min(60, Math.max(roadStep, 30))) {
 				const noiseVal = noise2D(x * noiseScale, y * noiseScale);
 				if (noiseVal > roadThreshold) {
 					newPoints.push([x, y]);

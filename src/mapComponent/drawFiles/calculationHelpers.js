@@ -192,9 +192,9 @@ function getAccessRoads(mainRoads, housePoints) {
 
 export function makeMap(points, canvasSize, roadStep, numSprites, spriteScale, spriteHeight) {
 	if (!points || points.length === 0) return null;
-	if (points.length > 500) return null;
+	if (points.length > 600) return null;
 
-	const minDistanceFromEdge = roadStep * 4;
+	const minDistanceFromEdge = roadStep*2;
 	const filteredPoints = points.filter(
 		([x, y]) =>
 			x > minDistanceFromEdge &&
