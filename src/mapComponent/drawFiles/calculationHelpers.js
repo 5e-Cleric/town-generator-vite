@@ -1,23 +1,23 @@
 import { Delaunay } from "https://cdn.jsdelivr.net/npm/d3-delaunay@6/+esm";
 
-export function pointsEqual(a, b) {
+function pointsEqual(a, b) {
 	return a[0] === b[0] && a[1] === b[1];
 }
 
-export function mainRoadsEqual(e1, e2) {
+function mainRoadsEqual(e1, e2) {
 	return (
 		(pointsEqual(e1.from, e2.from) && pointsEqual(e1.to, e2.to)) ||
 		(pointsEqual(e1.from, e2.to) && pointsEqual(e1.to, e2.from))
 	);
 }
 
-export function distSquared([x1, y1], [x2, y2]) {
+function distSquared([x1, y1], [x2, y2]) {
 	const dx = x2 - x1,
 		dy = y2 - y1;
 	return dx * dx + dy * dy;
 }
 
-export function isParallel(edgeA, edgeB) {
+function isParallel(edgeA, edgeB) {
 	const dx1 = edgeA.to[0] - edgeA.from[0];
 	const dy1 = edgeA.to[1] - edgeA.from[1];
 	const dx2 = edgeB.to[0] - edgeB.from[0];
@@ -25,19 +25,19 @@ export function isParallel(edgeA, edgeB) {
 	return Math.abs(dx1 * dy2 - dy1 * dx2) < 0.01;
 }
 
-export function isBorderEdge(edge, canvasSize) {
+function isBorderEdge(edge, canvasSize) {
 	const { from, to } = edge;
 	return [from, to].some(([x, y]) => x === 0 || x === canvasSize || y === 0 || y === canvasSize);
 }
 
-export function isFullBorderEdge(edge, canvasSize) {
+function isFullBorderEdge(edge, canvasSize) {
 	const { from, to } = edge;
 	if (from[0] === to[0] && (from[0] === 0 || from[0] === canvasSize)) return true;
 	if (from[1] === to[1] && (from[1] === 0 || from[1] === canvasSize)) return true;
 	return false;
 }
 
-export function mainRoadsTooClose(e1, e2, minDist = 50) {
+function mainRoadsTooClose(e1, e2, minDist = 50) {
 	const dists = [
 		distSquared(e1.from, e2.from),
 		distSquared(e1.from, e2.to),
@@ -48,7 +48,7 @@ export function mainRoadsTooClose(e1, e2, minDist = 50) {
 	return dists.some((d) => d < minDistSq);
 }
 
-export function filterMainRoads(mainRoads, canvasSize) {
+function filterMainRoads(mainRoads, canvasSize) {
 	const keptMainRoads = [];
 
 	for (const edge of mainRoads) {
@@ -71,7 +71,7 @@ export function filterMainRoads(mainRoads, canvasSize) {
 	return keptMainRoads;
 }
 
-export function getMainRoads(points, canvasSize) {
+function getMainRoads(points, canvasSize) {
 	const unFilteredMainRoads = [];
 	const voronoi = Delaunay.from(points).voronoi([0, 0, canvasSize, canvasSize]);
 
@@ -90,7 +90,7 @@ export function getMainRoads(points, canvasSize) {
 	return mainRoads;
 }
 
-export function removeDuplicates(mainRoads) {
+function removeDuplicates(mainRoads) {
 	const unique = [];
 	for (const e of mainRoads) {
 		if (!unique.some((u) => mainRoadsEqual(u, e))) {
@@ -100,7 +100,7 @@ export function removeDuplicates(mainRoads) {
 	return unique;
 }
 
-export function getHousePoints(mainRoads, canvasSize, spriteHeight, numSprites) {
+function getHousePoints(mainRoads, canvasSize, spriteHeight, numSprites) {
 	const density = parseFloat(localStorage.getItem("houseDensity")) || 0.1;
 	const minDist = Math.round(spriteHeight * 50);
 	const offset = Math.round(spriteHeight * 50 + 5);
@@ -160,7 +160,7 @@ export function getHousePoints(mainRoads, canvasSize, spriteHeight, numSprites) 
 	return housePoints;
 }
 
-export function getAccessRoads(mainRoads, housePoints) {
+function getAccessRoads(mainRoads, housePoints) {
 	const accessRoads = [];
 
 	for (const house of housePoints) {
@@ -188,49 +188,6 @@ export function getAccessRoads(mainRoads, housePoints) {
 	}
 
 	return accessRoads;
-}
-
-export function mergeColinearMainRoads(mainRoads) {
-	const merged = [];
-	const used = new Set();
-
-	for (let i = 0; i < mainRoads.length; i++) {
-		if (used.has(i)) continue;
-
-		let current = mainRoads[i];
-		used.add(i);
-
-		let mergedThisRound;
-		do {
-			mergedThisRound = false;
-
-			for (let j = 0; j < mainRoads.length; j++) {
-				if (used.has(j)) continue;
-				const candidate = mainRoads[j];
-				if (!isParallel(current, candidate)) continue;
-
-				let sharedPoint = null;
-				if (pointsEqual(current.from, candidate.from)) sharedPoint = { from: current.to, to: candidate.to };
-				else if (pointsEqual(current.from, candidate.to))
-					sharedPoint = { from: current.to, to: candidate.from };
-				else if (pointsEqual(current.to, candidate.from))
-					sharedPoint = { from: current.from, to: candidate.to };
-				else if (pointsEqual(current.to, candidate.to))
-					sharedPoint = { from: current.from, to: candidate.from };
-
-				if (sharedPoint) {
-					current = sharedPoint;
-					used.add(j);
-					mergedThisRound = true;
-					break;
-				}
-			}
-		} while (mergedThisRound);
-
-		merged.push(current);
-	}
-
-	return merged;
 }
 
 export function makeMap(points, canvasSize, roadStep, numSprites, spriteScale, spriteHeight) {

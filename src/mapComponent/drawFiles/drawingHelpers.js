@@ -241,17 +241,6 @@ export function drawEdgeCorners(mainRoads, roadWidth, roadRadius, edgeColor, ctx
 	});
 }
 
-function ensureClockwise(points) {
-	let sum = 0;
-	for (let i = 0; i < points.length; i++) {
-		const p1 = points[i];
-		const p2 = points[(i + 1) % points.length];
-		sum += (p2.x - p1.x) * (p2.y + p1.y);
-	}
-	if (sum > 0) points.reverse();
-	return points;
-}
-
 // Helper function: Convex Hull using Graham Scan
 function convexHull(points) {
 	if (points.length <= 3) return points.slice();
