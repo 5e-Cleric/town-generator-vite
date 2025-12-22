@@ -85,8 +85,8 @@ export const MapProvider = ({ children }) => {
 		if (!settingsLoaded) return;
 
 		const newPoints = [];
-		for (let x = 0; x < canvasSize; x += Math.min(60, Math.max(roadStep, 30))) {
-			for (let y = 0; y < canvasSize; y += Math.min(60, Math.max(roadStep, 30))) {
+		for (let x = 0; x < safeCanvasSize; x += Math.min(60, Math.max(roadStep, 30))) {
+			for (let y = 0; y < safeCanvasSize; y += Math.min(60, Math.max(roadStep, 30))) {
 				const noiseVal = noise2D(x * noiseScale, y * noiseScale);
 				if (noiseVal > roadThreshold) {
 					newPoints.push([x, y]);
@@ -103,8 +103,8 @@ export const MapProvider = ({ children }) => {
 		const treeThreshold = -0.5;
 
 		const newPoints = [];
-		for (let x = 0; x < canvasSize; x += treeStep) {
-			for (let y = 0; y < canvasSize; y += treeStep) {
+		for (let x = 0; x < safeCanvasSize; x += treeStep) {
+			for (let y = 0; y < safeCanvasSize; y += treeStep) {
 				const noiseVal = noise2D(x * noiseScale, y * noiseScale);
 				if (noiseVal > treeThreshold) {
 					newPoints.push([x, y]);
