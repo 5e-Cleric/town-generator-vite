@@ -8,7 +8,7 @@ function CreatePage() {
 		<MapProvider>
 			<RenderMapSettings />
 			<RenderMapCreator />
-			{/* <RenderMapAssets /> */}
+			<RenderMapAssets />
 		</MapProvider>
 	);
 }

@@ -13,6 +13,7 @@ export const MapProvider = ({ children }) => {
 	const spritesPerRow = 8;
 
 	const [mapSettings, setSettings] = useState({
+		theme: "default",
 		canvasSize: 600,
 		roadStep: 60,
 		noiseScale: 0.1,
@@ -50,6 +51,7 @@ export const MapProvider = ({ children }) => {
 	useEffect(() => {
 		setSettings((prev) => ({
 			...prev,
+			theme: localStorage.getItem("theme") || prev.theme,
 			canvasSize: parseInt(localStorage.getItem("canvasSize")) || prev.canvasSize,
 			roadStep: parseInt(localStorage.getItem("roadDensity")) || prev.roadStep,
 			roadWidth: parseInt(localStorage.getItem("roadWidth")) || prev.roadWidth,
@@ -66,6 +68,7 @@ export const MapProvider = ({ children }) => {
 		setSettingsLoaded(true);
 	}, []);
 
+	//calculate points
 	useEffect(() => {
 		if (!settingsLoaded) return;
 
@@ -81,7 +84,7 @@ export const MapProvider = ({ children }) => {
 
 		setPoints(newPoints);
 	}, [safeCanvasSize, roadStep, noiseScale, roadThreshold, settingsLoaded]);
-
+	//calculate denser points for trees
 	useEffect(() => {
 		if (!settingsLoaded) return;
 
@@ -102,7 +105,7 @@ export const MapProvider = ({ children }) => {
 
 	useEffect(() => {
 		if (!settingsLoaded) return;
-
+		localStorage.getItem("theme", mapSettings.theme);
 		localStorage.setItem("canvasSize", mapSettings.canvasSize);
 		localStorage.setItem("roadDensity", mapSettings.roadStep);
 		localStorage.setItem("roadWidth", mapSettings.roadWidth);

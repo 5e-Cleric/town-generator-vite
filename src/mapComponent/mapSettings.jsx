@@ -1,12 +1,12 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { MapContext } from "./mapContext.jsx";
 
 import JSZip from "jszip";
 
 function RenderMapSettings() {
 	const { mapSettings, setSettings, layers, safeCanvasSize } = useContext(MapContext);
-	const ROAD_STEP_MIN = 40; // densest
-	const ROAD_STEP_MAX = 100; // sparsest
+
+	const [tab, setTab] = useState("settings");
 
 	function handleChange(e) {
 		const { id, name, value, type, min, max, dataset } = e.target;
@@ -95,193 +95,235 @@ function RenderMapSettings() {
 		URL.revokeObjectURL(link.href);
 	};
 
+	const settingsForm = () => {
+		return (
+			<section className="tab settings">
+				<form id="settings">
+					<fieldset>
+						<h3>General settings</h3>
+						<label>
+							<p>Canvas Size:</p>
+							<input
+								type="number"
+								id="canvasSize"
+								value={mapSettings.canvasSize}
+								step={10}
+								onChange={handleChange}
+							/>
+						</label>
+					</fieldset>
+
+					<details>
+						<summary>Main Roads</summary>
+						<label>
+							<p>Road Density</p>
+							<input
+								type="range"
+								id="roadStep"
+								min="0"
+								max="100"
+								step="10"
+								value={mapValue(mapSettings.roadStep, 40, 100, 0, 100, true)}
+								data-map-min={40}
+								data-map-max={100}
+								data-reverse={true}
+								onChange={handleChange}
+							/>
+						</label>
+
+						<label>
+							<p>Road Width:</p>
+							<input
+								type="range"
+								id="roadWidth"
+								min="5"
+								max="20"
+								step="0.2"
+								value={mapSettings.roadWidth}
+								unit="px"
+								onChange={handleChange}
+							/>
+						</label>
+
+						<label>
+							<p>Road Radius:</p>
+							<input
+								type="range"
+								id="roadRadius"
+								min="0"
+								max="20"
+								step="0.1"
+								value={mapSettings.roadRadius}
+								unit="px"
+								onChange={handleChange}
+							/>
+						</label>
+					</details>
+					<details>
+						<summary>Houses</summary>
+						<label>
+							<p>House sizes:</p>
+							<input
+								type="range"
+								id="spriteScale"
+								min="0.2"
+								max="1.5"
+								step="0.1"
+								value={mapSettings.spriteScale}
+								onChange={handleChange}
+							/>
+						</label>
+						<div className="radioGroup">
+							<label>
+								<input
+									type="radio"
+									name="shadowType"
+									value="noShadow"
+									checked={mapSettings.shadowType === "noShadow"}
+									onChange={handleChange}
+								/>
+								No Shadow
+							</label>
+
+							<label>
+								<input
+									type="radio"
+									name="shadowType"
+									value="simpleShadow"
+									checked={mapSettings.shadowType === "simpleShadow"}
+									onChange={handleChange}
+								/>
+								Simple Shadow
+							</label>
+
+							<label>
+								<input
+									type="radio"
+									name="shadowType"
+									value="blurredShadow"
+									checked={mapSettings.shadowType === "blurredShadow"}
+									onChange={handleChange}
+								/>
+								Blurred Shadow
+							</label>
+						</div>
+
+						<label>
+							<p>Shadow Angle</p>
+							<input
+								type="range"
+								id="shadowAngle"
+								min="0"
+								max={(2 * Math.PI).toString()}
+								step="0,785398"
+								value={mapSettings.shadowAngle}
+								unit="rad"
+								onChange={handleChange}
+								disabled={mapSettings.shadowType === "noShadow" || mapSettings.shadowLength < 1}
+								title={
+									mapSettings.shadowType === "noShadow" || mapSettings.shadowLength < 1
+										? "There is no shadow."
+										: ""
+								}
+							/>
+						</label>
+						<label>
+							<p>Shadow Length</p>
+							<input
+								type="range"
+								id="shadowLength"
+								min="0"
+								max="10"
+								step="0.1"
+								value={mapSettings.shadowLength}
+								displayedvalue={Math.round(mapSettings.spriteScale * 10 * mapSettings.shadowLength)}
+								unit="px"
+								onChange={handleChange}
+								disabled={mapSettings.shadowType === "noShadow"}
+								title={mapSettings.shadowType === "noShadow" ? "There is no shadow." : ""}
+							/>
+							<small>Note: shadow blurriness depends on the length.</small>
+						</label>
+					</details>
+					<details>
+						<summary>Forests</summary>
+						<label>
+							<p>Forest size</p>
+							<input
+								type="range"
+								id="treeStep"
+								min="0"
+								max="100"
+								step="10"
+								value={mapValue(mapSettings.treeStep, 40, 65, 0, 100)}
+								data-map-min="40"
+								data-map-max="65"
+								onChange={handleChange}
+							/>
+						</label>
+						<label>
+							<p>Distance from forest to town</p>
+							<input
+								type="range"
+								id="treeDistance"
+								min="0"
+								max="100"
+								step="5"
+								value={mapSettings.treeDistance}
+								displayedvalue={Math.round(mapSettings.treeDistance)}
+								unit="px"
+								onChange={handleChange}
+							/>
+						</label>
+					</details>
+				</form>
+			</section>
+		);
+	};
+
+	const themePanel = () => {
+		const themes = [
+			{ id: "default", name: "Default", colors: [], houseSprite: "", treeSprite: "" },
+			{ id: "b&w", name: "Black and white", colors: [], houseSprite: "", treeSprite: "" },
+			{ id: "parchment", name: "Parchment", colors: [], houseSprite: "", treeSprite: "" },
+		];
+		console.log(mapSettings.theme);
+
+		return (
+			<section className="tab themes">
+				<ul className="available">
+					{themes.map((theme, i) => {
+						return (
+							<li key={theme.id}>
+								<button
+									className="theme"
+									onClick={() => setSettings((prev) => ({ ...prev, theme: theme.id }))}
+									data-active={mapSettings.theme === theme.id || undefined}
+									aria-pressed={mapSettings.theme === theme.id}>
+									{theme.name}
+								</button>
+							</li>
+						);
+					})}
+				</ul>
+			</section>
+		);
+	};
+
 	return (
 		<aside className="sidebar">
 			<h2>Generator Settings</h2>
-			<form id="settings">
-				<fieldset>
-					<h3>General settings</h3>
-					<label>
-						<p>Canvas Size:</p>
-						<input
-							type="number"
-							id="canvasSize"
-							value={mapSettings.canvasSize}
-							step={10}
-							onChange={handleChange}
-						/>
-					</label>
-				</fieldset>
+			<div className="tabs">
+				<button onClick={() => setTab("settings")} data-active={tab === "settings"}>Settings</button>
+				<button onClick={() => setTab("themes")} data-active={tab === "themes"}>Themes</button>
+			</div>
 
-				<details>
-					<summary>Main Roads</summary>
-					<label>
-						<p>Road Density</p>
-						<input
-							type="range"
-							id="roadStep"
-							min="0"
-							max="100"
-							step="10"
-							value={mapValue(mapSettings.roadStep, 40, 100, 0, 100, true)}
-							data-map-min={40}
-							data-map-max={100}
-							data-reverse={true}
-							onChange={handleChange}
-						/>
-					</label>
-
-					<label>
-						<p>Road Width:</p>
-						<input
-							type="range"
-							id="roadWidth"
-							min="5"
-							max="20"
-							step="0.2"
-							value={mapSettings.roadWidth}
-							unit="px"
-							onChange={handleChange}
-						/>
-					</label>
-
-					<label>
-						<p>Road Radius:</p>
-						<input
-							type="range"
-							id="roadRadius"
-							min="0"
-							max="20"
-							step="0.1"
-							value={mapSettings.roadRadius}
-							unit="px"
-							onChange={handleChange}
-						/>
-					</label>
-				</details>
-
-				<details>
-					<summary>Houses</summary>
-					<label>
-						<p>House sizes:</p>
-						<input
-							type="range"
-							id="spriteScale"
-							min="0.2"
-							max="1.5"
-							step="0.1"
-							value={mapSettings.spriteScale}
-							onChange={handleChange}
-						/>
-					</label>
-					<div className="radioGroup">
-						<label>
-							<input
-								type="radio"
-								name="shadowType"
-								value="noShadow"
-								checked={mapSettings.shadowType === "noShadow"}
-								onChange={handleChange}
-							/>
-							No Shadow
-						</label>
-
-						<label>
-							<input
-								type="radio"
-								name="shadowType"
-								value="simpleShadow"
-								checked={mapSettings.shadowType === "simpleShadow"}
-								onChange={handleChange}
-							/>
-							Simple Shadow
-						</label>
-
-						<label>
-							<input
-								type="radio"
-								name="shadowType"
-								value="blurredShadow"
-								checked={mapSettings.shadowType === "blurredShadow"}
-								onChange={handleChange}
-							/>
-							Blurred Shadow
-						</label>
-					</div>
-
-					<label>
-						<p>Shadow Angle</p>
-						<input
-							type="range"
-							id="shadowAngle"
-							min="0"
-							max={(2 * Math.PI).toString()}
-							step="0,785398"
-							value={mapSettings.shadowAngle}
-							unit="rad"
-							onChange={handleChange}
-							disabled={mapSettings.shadowType === "noShadow" || mapSettings.shadowLength < 1}
-							title={
-								mapSettings.shadowType === "noShadow" || mapSettings.shadowLength < 1
-									? "There is no shadow."
-									: ""
-							}
-						/>
-					</label>
-					<label>
-						<p>Shadow Length</p>
-						<input
-							type="range"
-							id="shadowLength"
-							min="0"
-							max="10"
-							step="0.1"
-							value={mapSettings.shadowLength}
-							displayedvalue={Math.round(mapSettings.spriteScale * 10 * mapSettings.shadowLength)}
-							unit="px"
-							onChange={handleChange}
-							disabled={mapSettings.shadowType === "noShadow"}
-							title={mapSettings.shadowType === "noShadow" ? "There is no shadow." : ""}
-						/>
-						<small>Note: shadow blurriness depends on the length.</small>
-					</label>
-				</details>
-				<details>
-					<summary>Forests</summary>
-					<label>
-						<p>Forest size</p>
-						<input
-							type="range"
-							id="treeStep"
-							min="0"
-							max="100"
-							step="10"
-							value={mapValue(mapSettings.treeStep, 40, 65, 0, 100)}
-							data-map-min="40"
-							data-map-max="65"
-							onChange={handleChange}
-						/>
-					</label>
-					<label>
-						<p>Distance from forest to town</p>
-						<input
-							type="range"
-							id="treeDistance"
-							min="0"
-							max="100"
-							step="5"
-							value={mapSettings.treeDistance}
-							displayedvalue={Math.round(mapSettings.treeDistance)}
-							unit="px"
-							onChange={handleChange}
-						/>
-					</label>
-				</details>
-			</form>
-			<div className="downloads">
+			{tab === "settings" && settingsForm()}
+			{tab === "themes" && themePanel()}
+			<section className="downloads">
 				<button onClick={downloadMap}>Download Map</button>
 				<button onClick={downloadMapAsLayers}>Download Map as layers</button>
-			</div>
+			</section>
 		</aside>
 	);
 }
