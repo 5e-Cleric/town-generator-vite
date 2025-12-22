@@ -19,7 +19,7 @@ function App() {
 		<Router basename="/town-generator-vite">
 			<header>
 				<NaturalcritLogo />
-				{renderLoginButton()}
+				{/*renderLoginButton()*/}
 			</header>
 			<main>
 				<Routes>
