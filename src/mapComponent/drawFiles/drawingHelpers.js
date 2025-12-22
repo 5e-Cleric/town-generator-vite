@@ -2,7 +2,7 @@ import { createNoise2D } from "simplex-noise";
 
 // ############################   Drawing   #############################
 
-export function drawBackground(ctx, canvasSize) {
+export function drawBackground(ctx, canvasSize, theme) {
 	const noise2D = createNoise2D();
 	const step = 1;
 	const noiseScale = 0.001;
