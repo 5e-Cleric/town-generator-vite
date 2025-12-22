@@ -15,16 +15,22 @@ export const MapProvider = ({ children }) => {
 	const [mapSettings, setSettings] = useState({
 		theme: "default",
 		canvasSize: 600,
-		roadStep: 60,
 		noiseScale: 0.1,
+
+		roadStep: 60,
 		roadThreshold: 0,
 		roadWidth: 10,
 		roadRadius: 5,
+		roadColor: "#d8d1bc",
+		roadStrokeColor: "#809070",
+
 		spriteScale: 0.5,
 		numSprites: 8,
+
 		shadowType: "simpleShadows",
 		shadowAngle: 2,
 		shadowLength: 18,
+
 		treeStep: 60,
 		treeDistance: 60,
 	});
@@ -53,14 +59,20 @@ export const MapProvider = ({ children }) => {
 			...prev,
 			theme: localStorage.getItem("theme") || prev.theme,
 			canvasSize: parseInt(localStorage.getItem("canvasSize")) || prev.canvasSize,
+
 			roadStep: parseInt(localStorage.getItem("roadDensity")) || prev.roadStep,
 			roadWidth: parseInt(localStorage.getItem("roadWidth")) || prev.roadWidth,
 			roadRadius: parseInt(localStorage.getItem("roadWidth")) || prev.roadRadius,
+			roadColor: localStorage.getItem("roadColor") || prev.roadColor,
+			roadStrokeColor: localStorage.getItem("roadStrokeColor") || prev.roadStrokeColor,
+
 			spriteScale: parseFloat(localStorage.getItem("houseSize")) || prev.spriteScale,
+			numSprites: prev.numSprites,
+
 			shadowType: localStorage.getItem("shadowType") || prev.shadowType,
 			shadowAngle: parseFloat(localStorage.getItem("shadowAngle")) || prev.shadowAngle,
 			shadowLength: parseFloat(localStorage.getItem("shadowLength")) || prev.shadowLength,
-			numSprites: prev.numSprites,
+
 			treeStep: parseInt(localStorage.getItem("treeDensity")) || prev.treeStep,
 			treeDistance: parseInt(localStorage.getItem("treeDistance")) || prev.treeDistance,
 		}));
@@ -107,13 +119,18 @@ export const MapProvider = ({ children }) => {
 		if (!settingsLoaded) return;
 		localStorage.getItem("theme", mapSettings.theme);
 		localStorage.setItem("canvasSize", mapSettings.canvasSize);
+
 		localStorage.setItem("roadDensity", mapSettings.roadStep);
 		localStorage.setItem("roadWidth", mapSettings.roadWidth);
 		localStorage.setItem("roadRadius", mapSettings.roadRadius);
+		localStorage.setItem("roadColor", mapSettings.roadColor);
+		localStorage.setItem("roadStrokeColor", mapSettings.roadStrokeColor);
 		localStorage.setItem("houseSize", mapSettings.spriteScale);
+
 		localStorage.setItem("shadowType", mapSettings.shadowType);
 		localStorage.setItem("shadowAngle", mapSettings.shadowAngle);
 		localStorage.setItem("shadowLength", mapSettings.shadowLength);
+
 		localStorage.setItem("treeDensity", mapSettings.treeStep);
 		localStorage.setItem("treeDistance", mapSettings.treeDistance);
 	}, [mapSettings, settingsLoaded]);

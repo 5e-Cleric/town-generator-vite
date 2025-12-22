@@ -28,7 +28,6 @@ function RenderMapCreator() {
 		spritesPerRow,
 	} = useContext(MapContext);
 
-
 	const ctxb = layers.background.current?.getContext("2d");
 	const ctxr = layers.roads.current?.getContext("2d");
 	const ctxs = layers.shadows.current?.getContext("2d");
@@ -37,15 +36,22 @@ function RenderMapCreator() {
 	const ctxd = layers.debug.current?.getContext("2d");
 
 	const {
+		theme,
 		canvasSize,
+
 		roadStep,
 		roadWidth,
 		roadRadius,
+		roadColor,
+		roadStrokeColor,
+
 		numSprites,
 		spriteScale,
+
 		shadowType,
 		shadowAngle,
 		shadowLength,
+
 		treeStep,
 		treeDistance,
 	} = mapSettings;
@@ -71,8 +77,6 @@ function RenderMapCreator() {
 	);
 
 	const safeCanvasSize = Math.min(Math.max(canvasSize, 100), 800);
-	const roadColor = "#d8d1bc";
-	const roadOutlineColor = "#809070";
 
 	const map = useMemo(() => {
 		return makeMap(points, safeCanvasSize, roadStep, numSprites, spriteScale, spriteHeight);
@@ -134,7 +138,7 @@ function RenderMapCreator() {
 					roadRadius,
 					safeCanvasSize,
 					roadColor,
-					roadOutlineColor
+					roadStrokeColor
 				);
 				housePoints.forEach((p) => {
 					if (shadowType !== "noShadow" && shadowLength > 0) {
@@ -175,7 +179,7 @@ function RenderMapCreator() {
 					roadRadius,
 					safeCanvasSize,
 					roadColor,
-					roadOutlineColor
+					roadStrokeColor
 				);
 			} catch (error) {
 				console.error(error);
@@ -185,7 +189,7 @@ function RenderMapCreator() {
 		houseSheet.onerror = () => {
 			console.error("House tiles Image failed to load");
 		};
-	}, [roadWidth, roadRadius]);
+	}, [roadWidth, roadRadius, roadColor, roadStrokeColor]);
 
 	//redraw shadows
 	useEffect(() => {
@@ -213,7 +217,7 @@ function RenderMapCreator() {
 		if (!treePoints || treePoints.length > 300 || !ctxt || !map) return;
 
 		if (error?.errorCode === "11") setError(null);
-		
+
 		const treeSheet = new Image();
 		treeSheet.src = "assets/images/trees/tree tiles4.png";
 		treeSheet.onload = async () => {

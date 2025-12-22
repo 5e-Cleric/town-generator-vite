@@ -10,9 +10,10 @@ function RenderMapSettings() {
 
 	function handleChange(e) {
 		const { id, name, value, type, min, max, dataset } = e.target;
+
 		const mapMin = Number(dataset.mapMin);
 		const mapMax = Number(dataset.mapMax);
-		const reverse = dataset.reverse === "true"; // dataset values are strings
+		const reverse = dataset.reverse === "true";
 
 		// Radios
 		if (type === "radio") {
@@ -23,7 +24,15 @@ function RenderMapSettings() {
 			return;
 		}
 
-		const newValue = mapMin && mapMax ? mapValue(value, min, max, mapMin, mapMax, reverse) : Number(value);
+		let newValue;
+
+		if (type === "color") {
+			newValue = value;
+		} else if (Number.isFinite(mapMin) && Number.isFinite(mapMax)) {
+			newValue = mapValue(Number(value), Number(min), Number(max), mapMin, mapMax, reverse);
+		} else {
+			newValue = Number(value);
+		}
 
 		setSettings((prev) => ({
 			...prev,
@@ -136,7 +145,7 @@ function RenderMapSettings() {
 							<input
 								type="range"
 								id="roadWidth"
-								min="5"
+								min="1"
 								max="20"
 								step="0.2"
 								value={mapSettings.roadWidth}
@@ -146,7 +155,7 @@ function RenderMapSettings() {
 						</label>
 
 						<label>
-							<p>Road Radius:</p>
+							<p>Road Radius</p>
 							<input
 								type="range"
 								id="roadRadius"
@@ -155,6 +164,19 @@ function RenderMapSettings() {
 								step="0.1"
 								value={mapSettings.roadRadius}
 								unit="px"
+								onChange={handleChange}
+							/>
+						</label>
+						<label>
+							<p>Road colors</p>
+							<input type="color" id="roadColor" value={mapSettings.roadColor} onChange={handleChange} />
+						</label>
+						<label>
+							<p>Road stroke color</p>
+							<input
+								type="color"
+								id="roadStrokeColor"
+								value={mapSettings.roadStrokeColor}
 								onChange={handleChange}
 							/>
 						</label>
@@ -314,8 +336,12 @@ function RenderMapSettings() {
 		<aside className="sidebar">
 			<h2>Generator Settings</h2>
 			<div className="tabs">
-				<button onClick={() => setTab("settings")} data-active={tab === "settings"}>Settings</button>
-				<button onClick={() => setTab("themes")} data-active={tab === "themes"}>Themes</button>
+				<button onClick={() => setTab("settings")} data-active={tab === "settings"}>
+					Settings
+				</button>
+				<button onClick={() => setTab("themes")} data-active={tab === "themes"}>
+					Themes
+				</button>
 			</div>
 
 			{tab === "settings" && settingsForm()}
