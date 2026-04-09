@@ -312,8 +312,11 @@ function RenderMapSettings() {
 		console.log(mapSettings.theme);
 
 		return (
-			<section className="tab themes">
-				<ul className="available">
+			<section className="tab themes"><h2>
+				This section is <br />
+				still in development
+			</h2>
+				{/* <ul className="available">
 					{themes.map((theme, i) => {
 						return (
 							<li key={theme.id}>
@@ -327,7 +330,7 @@ function RenderMapSettings() {
 							</li>
 						);
 					})}
-				</ul>
+				</ul> */}
 			</section>
 		);
 	};
